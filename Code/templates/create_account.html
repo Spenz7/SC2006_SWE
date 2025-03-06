@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Create Account</h1>
+        
+        {% if error_message %}
+            <p style="color: red; font-weight: bold;">{{ error_message }}</p>
+        {% endif %}
+        
+        <form action="/create_account" method="POST">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" placeholder="Enter username" required><br><br>
+            
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" placeholder="Enter password" required><br><br>
+
+            <label for="user_type">User Type:</label><br>
+            <select id="user_type" name="user_type">
+                <option value="seller">Seller</option>
+                <option value="agent">Property Agent</option>
+            </select><br><br>
+            
+            <button type="submit">Create Account</button>
+        </form>
+        
+    </div>
+</body>
+</html>

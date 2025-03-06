@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="top-nav">
+        <a href="/logout" class="logout-btn">Logout</a>
+    </div>
+
+    <div class="container">
+        <h1>Welcome to Your Seller Dashboard!</h1>
+        <p>What would you like to do?</p>
+
+        <div class="buttons">
+            <a href="/create_listing" class="btn">Create a New Listing</a>
+            <a href="/view_listings" class="btn">View My Listings</a>
+        </div>
+    </div>
+</body>
+</html>
