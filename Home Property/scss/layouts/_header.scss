@@ -49,6 +49,7 @@
 			float: left;
 			width: 100%;
 			text-align: right;
+		}
 			.aa-register{
 				border-right: 1px solid #f8f8f8;
 				color: #fff;
@@ -60,6 +61,32 @@
 				color: #fff;
 				font-size: 15px;
 			}
+			/* Force Logout to be white */
+			#logout-link {
+				color: #ffffff !important;  /* Ensure white text */
+				font-size: 15px;
+				font-weight: bold; /* Make it match Login/Register */
+				text-decoration: none; /* Remove underline */
+				cursor: pointer;
+				transition: color 0.3s ease-in-out;
+			}
+
+			/* Fix visited link color */
+			#logout-link:visited {
+				color: #ffffff !important; /* Ensure it stays white */
+			}
+
+			/* Ensure Logout isn't disabled */
+			#logout-link:disabled {
+				color: #ffffff !important;
+				opacity: 1; /* Remove transparency effect */
+				pointer-events: auto; /* Make sure it's clickable */
+			}
+
+			/* Add hover effect like Register/Login */
+			#logout-link:hover {
+				color: #f8f8f8 !important;
+			}
 		}
 	}
-}
+

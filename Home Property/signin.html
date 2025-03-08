@@ -58,14 +58,22 @@
                 <a class="aa-property-home" href="index.html">Property Home</a>
                 <h4>Sign in to your account</h4>
               </div>
-              <form class="contactform">                                                 
-                <div class="aa-single-field">
-                  <label for="email">Email <span class="required">*</span></label>
-                  <input type="email" required="required" aria-required="true" value="" name="email">
-                </div>
+              <form class="contactform"> <!-- Check with database in login.js and send to relevant page (Agents/Seller)-->                                               
+                  <div class="aa-single-field">
+                    <label for="username">Username <span class="required">*</span></label>
+                    <input type="text" required="required" aria-required="true" name="username" id="username">
+                  </div>
                 <div class="aa-single-field">
                   <label for="password">Password <span class="required">*</span></label>
-                  <input type="password" name="password"> 
+                  <input type="password" name="password" id="password"> 
+                </div>
+                <div class="aa-single-field">
+                  <label for="account-type">Account Type <span class="required">*</span></label>
+                  <select name="account-type" id="account-type" required>
+                    <option value="">Select Account Type</option>
+                    <option value="property-agent">Property Agent</option>
+                    <option value="seller">Seller</option>
+                  </select>
                 </div>
                 <div class="aa-single-field">
                 <label>
@@ -99,6 +107,11 @@
   <script type="text/javascript" src="js/jquery.fancybox.pack.js"></script>
   <!-- Custom js -->
   <script src="js/custom.js"></script> 
+  
+  <script src="js/login.js"></script>
+
+  
+  
   
   </body>
 </html>
