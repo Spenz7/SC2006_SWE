@@ -2519,7 +2519,7 @@ img {
   display: inline-block;
   font-size: 25px;
   font-weight: bold;
-  margin-bottom: 10px;
+  margin-bottom: 1px;
   text-transform: uppercase;
 }
 #aa-signin .aa-signin-area .aa-signin-form .aa-signin-form-title h4 {
@@ -2607,6 +2607,66 @@ img {
   font-weight: bold;
 }
 
+.aa-single-field select {
+  width: 100%;
+  padding: 10px;
+  border: 2px solid #ddd;
+  border-radius: 5px;
+  font-size: 16px;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+  appearance: none; /* Removes default browser styles */
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+/* Style for the headline text */
+.aa-signin-form-title h4 {
+  font-size: 20px;
+  font-weight: 600; /* Semi-bold for better readability */
+  margin-top: 10px;
+  color: #f8f8f8; /* Soft white */
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3); /* Subtle shadow for depth */
+  font-family: 'Poppins', sans-serif; /* Modern, professional font */
+  padding: 10px;
+  border-radius: 8px;
+  /*background: rgba(0, 0, 0, 0.2); /* Soft dark transparent background */
+  display: inline-block;
+}
+/* Style for the "Property Home" link */
+.aa-signin-form-title .aa-property-home {
+  font-size: 22px;
+  font-weight: 700;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  font-family: 'Poppins', sans-serif;
+  text-decoration: none;
+  display: block;
+  margin-bottom: 5px; /* Reduced space between Property Home & headline */
+}
+
+/* Hover effect for "Property Home" */
+.aa-signin-form-title .aa-property-home:hover {
+  color: #ffcc00;
+  text-decoration: underline;
+}
+
+/* Style for the headline text */
+.aa-signin-form-title h4 {
+  font-size: 20px; /* Slightly smaller to maintain balance */
+  font-weight: 700;
+  margin-top: 0px; /* Removed extra space */
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+  font-family: 'Poppins', sans-serif;
+}
 /*==================
  FOOTER SECTION
 ====================*/
