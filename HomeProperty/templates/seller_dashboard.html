@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('home') }}">Home</a></li>
+                <li><a href="{{ url_for('create_listing') }}">Create Listing</a></li>
+                <li><a href="{{ url_for('view_listings') }}">View Listings</a></li>
+                <li><a href="{{ url_for('logout') }}">Logout</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Welcome, {{ session['full_name'] }}!</h1>
+        <p>This is your dashboard where you can manage your property listings.</p>
+        
+        <section>
+            <h2>Your Listings</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Property Name</th>
+                        <th>Price</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Property 1</td>
+                        <td>$500,000</td>
+                        <td>Available</td>
+                    </tr>
+                    <tr>
+                        <td>Property 2</td>
+                        <td>$750,000</td>
+                        <td>Sold</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Your Property Platform</p>
+    </footer>
+</body>
+</html>

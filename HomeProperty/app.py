@@ -1,25 +1,38 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, flash
 import sqlite3
 import re
 import os
+import requests
 
 app = Flask(__name__)
 
 #need this to keep track of session
-app.secret_key = os.urandom(24)
+app.secret_key = "your_secret_key_here"
 
 # Database setup (SQLite)
 def init_db():
     conn = sqlite3.connect('accounts.db')
     c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS users (
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
-                    username TEXT NOT NULL,
-                    password TEXT NOT NULL,
-                    user_type TEXT NOT NULL
-                 )''')
+
+    # Drop the existing users table if needed (optional)
+    c.execute("DROP TABLE IF EXISTS users")
+
+    # Create the users table with agent_registration_no
+    c.execute('''
+        CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        full_name TEXT NOT NULL,
+        username TEXT UNIQUE NOT NULL,
+        password TEXT NOT NULL,
+        user_type TEXT NOT NULL CHECK(user_type IN ('seller', 'agent')),
+        agent_id TEXT UNIQUE DEFAULT NULL  -- Allow NULL for sellers
+        )
+    ''')
+
     conn.commit()
     conn.close()
+
+init_db() #re-run this whenever u wan del existing db
 
 #go to http://localhost:5000/view_accounts to view
 @app.route('/view_accounts')
@@ -33,38 +46,87 @@ def view_accounts():
     # Display the accounts
     return f"Accounts in database: {accounts}"
 
-# Account creation route
+# Function to check if agent ID exists in data.gov.sg API
+def check_agent_id(agent_id):
+    dataset_id = "d_07c63be0f37e6e59c07a4ddc2fd87fcb"
+    url = f"https://data.gov.sg/api/action/datastore_search?resource_id={dataset_id}"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        if 'result' in data and 'records' in data['result']:
+            records = data['result']['records']
+            
+            for record in records:
+                if record.get('registration_no') == agent_id:
+                    return True  # Agent ID found
+    except Exception as e:
+        print("Error fetching agent data:", e)
+    
+    return False  # Agent ID not found
+
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user_type = request.form['user-type']  # Either 'seller' or 'agent'
-
-        # Check if the username already exists in the database
+        full_name = request.form['full_name'].strip()
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        user_type = request.form['user-type'].strip()  # Either 'seller' or 'agent'
+        
+        # Initialize database connection
         conn = sqlite3.connect('accounts.db')
         c = conn.cursor()
+
+        # Check if username already exists
         c.execute("SELECT * FROM users WHERE username=?", (username,))
-        existing_user = c.fetchone()  # Fetch one user with the same username
-        conn.close()
-
+        existing_user = c.fetchone()
         if existing_user:
-            # If the username exists, display an error message
+            conn.close()
             error_message = "Username already taken. Please choose another one."
-            return render_template('register.html', error_message=error_message)
+            return render_template('create_account.html', error_message=error_message)
 
-        # If username doesn't exist, insert the new account into the database
-        conn = sqlite3.connect('accounts.db')
-        c = conn.cursor()
-        c.execute("INSERT INTO users (username, password, user_type) VALUES (?, ?, ?)", 
-                  (username, password, user_type))
+        # Separate handling for agents and sellers
+        if user_type == 'seller':
+            # Directly insert seller account
+            c.execute("INSERT INTO users (full_name, username, password, user_type) VALUES (?, ?, ?, ?)",
+                      (full_name, username, password, user_type))
+        
+        elif user_type == 'agent':
+            agent_id = request.form.get('agent_id', '').strip()  # Safely get the agent_id
+            
+            # Ensure the agent_id is present when the user selects 'agent'
+            if not agent_id:
+                conn.close()
+                error_message = "Agent registration number is required."
+                return render_template('create_account.html', error_message=error_message)
+
+            # Validate agent ID against data.gov.sg API
+            if not check_agent_id(agent_id):
+                conn.close()
+                error_message = "Invalid agent registration number. Please enter a valid ID."
+                return render_template('create_account.html', error_message=error_message)
+
+            # If valid, insert agent account
+            c.execute("INSERT INTO users (full_name, username, password, user_type, agent_id) VALUES (?, ?, ?, ?, ?)",
+                      (full_name, username, password, user_type, agent_id))
+        
+        else:
+            conn.close()
+            error_message = "Invalid user type selected."
+            return render_template('create_account.html', error_message=error_message)
+
+        # Commit changes and close connection
         conn.commit()
         conn.close()
 
-        # Redirect to login page after successful account creation
+        flash("Account created successfully!", "success")
         return redirect(url_for('login'))
 
-    return render_template('register.html')
+    return render_template('create_account.html')
+
+
+
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
@@ -78,26 +140,28 @@ def login():
         conn = sqlite3.connect('accounts.db')
         c = conn.cursor()
         c.execute("SELECT * FROM users WHERE username=? AND password=? AND user_type=?", 
-                  (username, password, user_type))
+          (username.strip(), password.strip(), user_type.strip()))
         user = c.fetchone()  # Fetch one row matching the criteria
         conn.close()
 
         if user:
-            # Successful login, store the username and user_type in session
             session['username'] = username
             session['user_type'] = user_type
+            session['full_name'] = user[1]
             
-            # Redirect to the appropriate dashboard
+            print("DEBUG: Session values:", session)  # Debugging statement
+            
             if user_type == "seller":
-                return redirect('/seller_dashboard')  # Redirect to Seller dashboard
+                return redirect('/seller_dashboard')
             else:
-                return redirect('/agent_dashboard')  # Redirect to Agent dashboard
+                return redirect('/agent_dashboard')
         else:
             # Invalid login, pass an error message back to the template
-            error_message = "Invalid credentials or user type. Please try again."
-            return render_template('signin.html', error_message=error_message)
+            error_message = "Either Invalid credentials or account doesn't exist. Please try again."
+            return render_template('login.html', error_message=error_message)
 
-    return render_template('signin.html')
+    return render_template('login.html')
+
 
 @app.route('/logout')
 def logout():
@@ -106,12 +170,14 @@ def logout():
     session.pop('user_type', None)
     
     # Redirect the user to the login page after logging out
-    return redirect(url_for('home'))
+    return redirect(url_for('index'))    
 
 
 @app.route('/seller_dashboard')
 def seller_dashboard():
-    return render_template('properties-detail.html') #seller-dashboard.html <currently properties-detail for placeholder>
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Ensure user is logged in
+    return f"Welcome {session['full_name']}, this is the seller dashboard."
 
 @app.route('/create_listing')
 def create_listing():
@@ -129,6 +195,7 @@ def agent_dashboard():
 @app.route('/404')
 def error_page():
     return render_template('404.html')
+    
 @app.route('/blog-archive')
 def blog_archive():
     return render_template('blog-archive.html')
@@ -144,7 +211,7 @@ def gallery():
 
 # Home route with buttons
 @app.route('/')
-def home():
+def index():
     return render_template('index.html')
 
 if __name__ == '__main__':
