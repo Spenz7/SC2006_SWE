@@ -29,7 +29,7 @@
   
 
   </head>
-  <body>
+
   <!-- Pre Loader -->
   <div id="aa-preloader-area">
     <div class="pulse"></div>
@@ -129,16 +129,14 @@
   </section>
   <!-- End menu section -->
 
-  <!-- Start Proerty header  -->
+  <!-- Start Prozerty header  -->
   <section id="aa-property-header">
     <div class="container">
       <div class="row">
         <div class="col-md-12">
           <div class="aa-property-header-inner">
-            <h2>404 Error</h2>
-            <ol class="breadcrumb">
-            <li><a href="#">HOME</a></li>            
-            <li class="active">404</li>
+            <h2>LIST YOUR PROPERTY HERE</h2>
+           
           </ol>
           </div>
         </div>
@@ -147,17 +145,76 @@
   </section> 
   <!-- End Proerty header  -->
   <section id="aa-error">
-    <div class="container">
-      <row>
-        <div class="col-md-12">
-          <div class="aa-error-area">
-            <h2>404</h2>
-            <p><span class="fa fa-warning"></span>Oops! The Page you requested was not found!</p>
-            <a href="#">Back Home</a>
+    <section class="container">
+      <form id="property-form" method="POST" action="/list-property">
+          <!-- Flat Type -->
+          <div class="form-group">
+              <label class=label-flat-type for="flat_type">Flat Type:</label>
+              <select id="flat_type" name="flat_type" class="form-control" required>
+                  <option value="">Select Flat Type</option>
+                  <option value="4 ROOM">4 ROOM</option>
+                  <option value="3 ROOM">3 ROOM</option>
+                  <option value="5 ROOM">5 ROOM</option>
+                  <option value="EXECUTIVE">EXECUTIVE</option>
+                  <option value="2 ROOM">2 ROOM</option>
+                  <option value="1 ROOM">1 ROOM</option>
+                  <option value="MULTI-GENERATION">MULTI-GENERATION</option>
+              </select>
           </div>
-        </div>
-      </row>
-    </div>
+
+          <!-- Town Dropdown -->
+          <div class="form-group">
+              <label for="town">Town:</label>
+              <select id="town" name="town" class="form-control" required>
+                  <option value="">Loading towns...</option>
+              </select>
+          </div>
+
+          <!-- Street Name Dropdown -->
+          <div class="form-group">
+              <label for="street_name">Street Name:</label>
+              <select id="street_name" name="street_name" class="form-control" required>
+                  <option value="">Select a Street</option>
+              </select>
+          </div>
+
+          <!-- Floor Area (sq ft) -->
+          <div class="form-group">
+              <label for="floor_area">Floor Area (sq ft):</label>
+              <input type="number" id="floor_area" name="floor_area" class="form-control" min="1" required>
+              <small id="floor-area-error" style="color: red; display: none;">Floor area cannot be negative.</small>
+          </div>
+
+          <!-- Minimum Bid Interval -->
+          <div class="form-group">
+              <label for="min_bid_interval">Minimum Bid Interval (0-3%):</label>
+              <input type="number" id="min_bid_interval" name="min_bid_interval" class="form-control" min="0" max="3" step="0.1" required>
+              <small id="bid-interval-error" style="color: red; display: none;">Value must be between 0% and 3%.</small>
+          </div>
+
+          <!-- Years Remaining -->
+          <div class="form-group">
+              <label for="years_remaining">Years Remaining:</label>
+              <input type="number" id="years_remaining" name="years_remaining" class="form-control" min="1" required>
+          </div>
+
+          <button type="button" class="btn btn-primary" onclick="fetchPastPrices()">Fetch Past Prices</button>
+          
+          <div class="form-group" id="past-prices" style="display:none;">
+              <label>Past Prices (Government Data):</label>
+              <ul id="past-prices-list"></ul>
+          </div>
+
+          <!-- Listing Price -->
+          <div class="form-group">
+              <label for="listing_price">Set Your Listing Price ($):</label>
+              <input type="number" id="listing_price" name="listing_price" class="form-control" required>
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" class="aa-btnlistproperty">Submit Property</button>
+      </form>
+  </section>
   </section>
 
 
@@ -199,6 +256,26 @@
   <!-- / Footer -->
 
   
+   <!-- Validation Script -->
+   <script>
+    document.getElementById("floor_area").addEventListener("input", function() {
+        if (this.value < 1) {
+            this.value = "";
+            document.getElementById("floor-area-error").style.display = "block";
+        } else {
+            document.getElementById("floor-area-error").style.display = "none";
+        }
+    });
+
+    document.getElementById("min_bid_interval").addEventListener("input", function() {
+        if (this.value < 0 || this.value > 3) {
+            this.value = "";
+            document.getElementById("bid-interval-error").style.display = "block";
+        } else {
+            document.getElementById("bid-interval-error").style.display = "none";
+        }
+    });
+</script>
   <!-- jQuery library -->
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
@@ -207,5 +284,7 @@
   <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/streetname.js') }}"></script>
+
   </body>
 </html>

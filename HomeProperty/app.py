@@ -15,11 +15,11 @@ def init_db():
     c = conn.cursor()
 
     # Drop the existing users table if needed (optional)
-    c.execute("DROP TABLE IF EXISTS users")
+   # c.execute("DROP TABLE IF EXISTS users")
 
     # Create the users table with agent_registration_no
     c.execute('''
-        CREATE TABLE users (
+        CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         full_name TEXT NOT NULL,
         username TEXT UNIQUE NOT NULL,
@@ -162,7 +162,6 @@ def login():
 
     return render_template('login.html')
 
-
 @app.route('/logout')
 def logout():
     # Remove the user from the session (log out)
@@ -173,23 +172,113 @@ def logout():
     return redirect(url_for('index'))    
 
 
+ # For Seller dashboards
 @app.route('/seller_dashboard')
 def seller_dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))  # Ensure user is logged in
-    return f"Welcome {session['full_name']}, this is the seller dashboard."
 
-@app.route('/create_listing')
-def create_listing():
-    return "This is where the seller can create a new listing."
+    return render_template('seller_dashboard.html', full_name=session.get('full_name'))
 
-@app.route('/view_listings')
-def view_listings():
-    return "This is where the seller can view their listings."
+# View Sellers own Properties (Seller)
+@app.route('/view_your_property')
+def view_your_property():
+    if 'username' not in session or session.get('user_type') != 'seller':
+        flash("Access denied!", "danger")
+        return redirect(url_for('login'))
 
+    return render_template('view_your_property.html')
+
+
+@app.route('/list-property', methods=['GET', 'POST'])
+def list_property():
+    if 'username' not in session:
+        return redirect(url_for('login'))  # Ensure user is logged in
+
+    if session.get('user_type') != 'seller':
+        flash("Only sellers can list properties!", "danger")
+        return redirect(url_for('index'))  # Redirect unauthorized users
+
+    if request.method == 'POST':
+        # Extract form data
+        flat_type = request.form.get('flat_type')
+        town = request.form.get('town')
+        street_name = request.form.get('street_name')
+        floor_area = request.form.get('floor_area')
+        min_bid_interval = request.form.get('min_bid_interval')
+        years_remaining = request.form.get('years_remaining')
+        listing_price = request.form.get('listing_price')
+
+        # Input validation
+        try:
+            floor_area = int(floor_area)
+            min_bid_interval = float(min_bid_interval)
+            years_remaining = int(years_remaining)
+            listing_price = float(listing_price)
+
+            if floor_area < 1 or min_bid_interval < 0 or min_bid_interval > 3 or years_remaining < 1 or listing_price < 0:
+                flash("Invalid input values!", "danger")
+                return redirect(url_for('list_property'))
+        except ValueError:
+            flash("Please enter valid numerical values.", "danger")
+            return redirect(url_for('list_property'))
+
+        # Database connection
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+
+        # Create a listings table if it doesn't exist
+        c.execute('''CREATE TABLE IF NOT EXISTS listings (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT,
+                        seller_username TEXT NOT NULL,
+                        flat_type TEXT NOT NULL,
+                        town TEXT NOT NULL,
+                        street_name TEXT NOT NULL,
+                        floor_area INTEGER NOT NULL,
+                        min_bid_interval REAL NOT NULL,
+                        years_remaining INTEGER NOT NULL,
+                        listing_price REAL NOT NULL
+                    )''')
+
+        # Insert the property listing
+        c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, min_bid_interval, years_remaining, listing_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                  (session['username'], flat_type, town, street_name, floor_area, min_bid_interval, years_remaining, listing_price))
+
+        conn.commit()
+        conn.close()
+
+        flash("Property listed successfully!", "success")
+        return redirect(url_for('seller_dashboard'))
+
+    return render_template('list-property.html')
+
+
+
+
+
+# For Agent Dashbaords.
 @app.route('/agent_dashboard')
 def agent_dashboard():
-    return render_template('properties.html')#agent-dashboard.html <currently properties.html for placeholder>
+    if 'username' not in session or session.get('user_type') != 'agent':
+        flash("Access denied! Only agents can view this page.", "danger")
+        return redirect(url_for('login'))
+
+    return render_template('agent_dashboard.html', full_name=session.get('full_name'))
+
+@app.route('/view_listed_property') #View Property that have been listed by the Agents available for bidding
+def view_listed_property():
+    if 'username' not in session or session.get('user_type') != 'agent':
+        flash("Access denied! Only agents can view this page.", "danger")
+        return redirect(url_for('login'))
+    return render_template('view_listed_property.html')
+
+@app.route('/view_bidded_property') #View Properties that you have bidded.
+def view_bidded_property():
+    if 'username' not in session or session.get('user_type') != 'agent':
+        flash("Access denied! Only agents can view this page.", "danger")
+        return redirect(url_for('login'))
+    return render_template('view_bidded_property.html')
+
 
 #unused
 @app.route('/404')

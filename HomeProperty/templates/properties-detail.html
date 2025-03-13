@@ -80,52 +80,68 @@
     </div>
   </header>
   <!-- End header section -->
-  <!-- Start menu section -->
-  <section id="aa-menu-area">
-    <nav class="navbar navbar-default main-navbar" role="navigation">  
-      <div class="container">
-        <div class="navbar-header">
-          <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
+<!-- Start menu section -->
+<section id="aa-menu-area">
+  <nav class="navbar navbar-default main-navbar" role="navigation">  
+    <div class="container">
+      <div class="navbar-header">
+        <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
         
-          <!-- LOGO -->                                               
-          <!-- Text based logo -->
-          <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
-          <!-- Image based logo -->
-          <!-- <a class="navbar-brand aa-logo-img" href="/"><img src="img/logo.png" alt="logo"></a> -->                     
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
-            <li><a href="/">HOME</a></li>
-             <li class="dropdown active">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="properties.html">PROPERTIES <span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">                
-                <li><a href="agent_dashboard">PROPERTIES</a></li>
-                <li><a href="seller_dashboard">PROPERTIES DETAIL</a></li>                                            
-              </ul>
-            </li>
-            <li><a href="gallery">GALLERY</a></li>                                         
+        <!-- LOGO -->                                               
+        <!-- Text based logo -->
+        <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
+        <!-- Image based logo -->
+        <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
+            <li class="active"><a href="/">HOME</a></li>
+            
             <li class="dropdown">
-              <a class="dropdown-toggle" data-toggle="dropdown" href="blog-archive">BLOG <span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">                
-                <li><a href="blog-archive">BLOG</a></li>
-                <li><a href="blog-single">BLOG DETAILS</a></li>                                            
-              </ul>
+                <a class="dropdown-toggle" data-toggle="dropdown" href="/agent_dashboard">PROPERTIES <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="/agent_dashboard">PROPERTIES</a></li>
+                    <li><a href="/seller_dashboard">PROPERTIES DETAIL</a></li>                                            
+                </ul>
             </li>
-            <li><a href="contact">CONTACT</a></li>
-            <li><a href="404">404 PAGE</a></li>
-          </ul>                               
-        </div><!--/.nav-collapse -->       
-      </div>          
-    </nav> 
-  </section>
-  <!-- End menu section -->
 
+            {% if 'username' in session %}
+                {% if session['user_type'] == 'seller' %}
+                    <!-- Seller-specific menu -->
+                    <li><a href="/list-property">List Property</a></li>
+                    <li><a href="/view_your_property">Your Property</a></li>
+                
+                {% elif session['user_type'] == 'agent' %}
+                    <!-- Agent-specific menu -->
+                    <li><a href="/view_listed_property">View Listed Property</a></li>
+                    <li><a href="/view_bidded_property">View Bidded Property</a></li>
+                {% endif %}
+                
+                <li><a href="/logout" class="aa-logout">Logout</a></li>
+            {% else %}
+                <li><a href="/gallery">GALLERY</a></li>                                         
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('blog_archive') }}">BLOG <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">                
+                        <li><a href="/blog-archive">BLOG</a></li>
+                        <li><a href="/blog-single">BLOG DETAILS</a></li>                                            
+                    </ul>
+                </li>
+                <li><a href="/contact">CONTACT</a></li>
+                <li><a href="/create_account" class="aa-register">Register</a></li>
+                <li><a href="/login" class="aa-login">Login</a></li>
+            {% endif %}
+        </ul>
+      </div>
+  </nav> 
+</section>
+<!-- End menu section -->
   <!-- Start Proerty header  -->
 
   <section id="aa-property-header">

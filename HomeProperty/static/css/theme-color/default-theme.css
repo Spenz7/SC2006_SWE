@@ -17,7 +17,11 @@ h2 {
 }
 
 .aa-view-btn {
-  background-color: #59abe3;
+  background-color: #000000;
+}
+
+.aa-btnlistproperty {
+  background-color: #947b7b;
 }
 .aa-view-btn:hover, .aa-view-btn:focus {
   color: #59abe3;
@@ -44,7 +48,7 @@ h2 {
   color: #59abe3;
 }
 #aa-menu-area .main-navbar .navbar-nav .active a {
-  color: #59abe3;
+  color: #000000;
 }
 #aa-menu-area .main-navbar .navbar-nav .open a {
   color: #59abe3;

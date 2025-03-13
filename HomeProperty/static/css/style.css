@@ -33,6 +33,7 @@
 #SIGNIN & REGISTER  PAGE
 #FOOTER SECTION
 #RESPONSIVE DESIGN
+#Style for List Property Form
 */
 /* BASE - Base tyles, Variables, Mixins, etc. */
 
@@ -115,7 +116,7 @@ img {
 }
 
 .aa-view-btn {
-  color: #fff;
+  color: #ffffff;
   padding: 10px 15px;
   font-size: 16px;
   display: inline-block;
@@ -129,6 +130,25 @@ img {
   background-color: #fff;
 }
 
+.aa-btnlistproperty {
+  color: #fff;
+  padding: 5px 15px;
+  border-radius: 30px;
+  background-color: #4C43CD;
+  background-image: radial-gradient(93% 87% at 87% 89%, rgba(0, 0, 0, 0.23) 0%, transparent 86.18%), radial-gradient(66% 87% at 26% 20%, rgba(255, 255, 255, 0.41) 0%, rgba(255, 255, 255, 0) 69.79%, rgba(255, 255, 255, 0) 100%);
+  box-shadow: 2px 19px 31px rgba(0, 0, 0, 0.2);
+  font-weight: bold;
+  font-size: 16px;
+
+  border: 0;
+
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+
+  cursor: pointer;
+}
+
 /* LAYOUTS - Page layout styles */
 
 /*==================
@@ -136,6 +156,7 @@ img {
 ====================*/
 
 #aa-header {
+  background-color: black;
   border-bottom: 1px solid #fff;
   left: 0;
   position: absolute;
@@ -145,6 +166,7 @@ img {
   z-index: 99;
 }
 #aa-header .aa-header-area {
+  background-color: black;
   display: inline;
   padding: 5px 0;
   float: left;
@@ -155,7 +177,19 @@ img {
   float: left;
   width: 100%;
 }
-#aa-header .aa-header-area .aa-header-left .aa-telephone-no {
+
+#aa-header .aa-header-area .aa-header-left .aa-lab-group .aa-lab-team .aa-lab-members {
+  display: inline;
+  float: left;
+  width: 100%;
+}
+#aa-header .aa-header-area .aa-header-left .aa-lab-group{
+  color: #fff;
+  float: left;
+  font-size: 15px;
+}
+
+#aa-header .aa-header-area .aa-header-left .aa-telephone-no .aa-lab-group .aa-lab-members .aa-lab-team{
   color: #fff;
   float: left;
   font-size: 15px;
@@ -201,21 +235,27 @@ img {
   font-size: 15px;
 }
 
+#aa-header .aa-header-area .aa-header-right .aa-header-home{
+  color: #fff;
+  font-size: 15px;
+}
+
 /*==================
  NAVBAR SECTION
 ====================*/
 
 #aa-menu-area {
+  background-color: black;
   left: 0;
-  padding-top: 20px;
+  padding-top: 0px;
   position: absolute;
   right: 0;
-  top: 35px;
+  top: 30px;
   width: 100%;
   z-index: 99;
 }
 #aa-menu-area .main-navbar {
-  background-color: transparent;
+  background-color: black;
   border: medium none;
   border-radius: 0;
 }
@@ -248,7 +288,8 @@ img {
   transition: all 0.5s;
 }
 #aa-menu-area .main-navbar .navbar-nav .active a {
-  background-color: #FFF;
+  background-color: #ffffff;
+
 }
 #aa-menu-area .main-navbar .navbar-nav .open a {
   background-color: #fff;
@@ -908,18 +949,19 @@ img {
 ====================*/
 
 #aa-promo-banner {
-  background-image: url("../img/promo-banner.jpg");
+  /*background-image: url("../img/promo-banner.jpg");*/
+  background-color: #f8f8f8;
   background-attachment: fixed;
   background-position: center center;
   background-size: cover;
   display: inline;
   float: left;
   width: 100%;
-  padding: 100px 0;
+  padding: 30px 0;
   position: relative;
 }
 #aa-promo-banner:before {
-  background-color: rgba(0, 0, 0, 0.6);
+  background-color: rgba(255, 255, 255, 0.6);
   content: '';
   position: absolute;
   left: 0;
@@ -935,14 +977,14 @@ img {
   text-align: center;
 }
 #aa-promo-banner .aa-promo-banner-area h3 {
-  color: #fff;
+  color: #050505;
   font-size: 40px;
   font-weight: 700;
   margin-bottom: 20px;
   text-transform: capitalize;
 }
 #aa-promo-banner .aa-promo-banner-area p {
-  color: #fff;
+  color: #000000;
   display: inline-block;
   font-size: 16px;
   margin-top: 10px;
@@ -3511,4 +3553,6 @@ img {
     left: 38%;  
   }
   
+  
+ 
 }

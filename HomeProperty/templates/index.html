@@ -50,22 +50,21 @@
                     <span class="fa fa-phone"></span>
                     1-900-523-3564
                   </div>
-                  <div class="aa-email hidden-xs">
-                    <span class="fa fa-envelope-o"></span> info@markups.com
-                  </div>
+                  
                 </div>              
               </div>
               <div class="col-md-6 col-sm-6 col-xs-6">
-                <div class="aa-header-right">
+              <!-- <div class="aa-header-right">
                   {% if 'username' in session %}
-                    <!-- Show logout button when user is logged in -->
+                    <!- - Show logout button when user is logged in - ->
                     <a href="{{ url_for('logout') }}" class="aa-logout">Logout</a>
                   {% else %}
-                    <!-- Show login and register when user is NOT logged in -->
+                    <!- - Show login and register when user is NOT logged in - ->
                     <a href="{{ url_for('create_account') }}" class="aa-register">Register</a>
                     <a href="{{ url_for('login') }}" class="aa-login">Login</a>
                   {% endif %}
-                </div>
+                </div> 
+              -->
               </div>
             </div>
           </div>
@@ -75,26 +74,71 @@
   </header>
   <!-- End header section -->
 
-  <!-- Start menu section -->
-  <section id="aa-menu-area">
-    <nav class="navbar navbar-default main-navbar" role="navigation">  
-      <div class="container">
-        <div class="navbar-header">
-          <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          
-          <!-- LOGO -->                                               
-          <!-- Text based logo -->
-           <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
-           <!-- Image based logo -->
-          <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
+ <!-- Start menu section -->
+<section id="aa-menu-area">
+  <nav class="navbar navbar-default main-navbar" role="navigation">  
+    <div class="container">
+      <div class="navbar-header">
+        <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        
+        <!-- LOGO -->                                               
+        <!-- Text based logo -->
+        <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
+            <li class="active"><a href="/">HOME</a></li>
+            
+            <li class="dropdown">
+                <a class="dropdown-toggle" data-toggle="dropdown" href="/agent_dashboard">PROPERTIES <span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href="/agent_dashboard">PROPERTIES</a></li>
+                    <li><a href="/seller_dashboard">PROPERTIES DETAIL</a></li>                                            
+                </ul>
+            </li>
+
+            {% if 'username' in session %}
+                {% if session['user_type'] == 'seller' %}
+                    <!-- Seller-specific menu -->
+                    <li><a href="/list-property">List Property</a></li>
+                    <li><a href="/view_your_property">Your Property</a></li>
+                
+                {% elif session['user_type'] == 'agent' %}
+                    <!-- Agent-specific menu -->
+                    <li><a href="/view_listed_property">View Listed Property</a></li>
+                    <li><a href="/view_bidded_property">View Bidded Property</a></li>
+                {% endif %}
+                
+                <li><a href="/logout" class="aa-logout">Logout</a></li>
+            {% else %}
+            <!--
+                <li><a href="/gallery">GALLERY</a></li>                                         
+                <li class="dropdown">
+                    <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('blog_archive') }}">BLOG <span class="caret"></span></a>
+                    <ul class="dropdown-menu" role="menu">                
+                        <li><a href="/blog-archive">BLOG</a></li>
+                        <li><a href="/blog-single">BLOG DETAILS</a></li>                                            
+                    </ul>
+                </li>
+                <li><a href="/contact">CONTACT</a></li>
+              -->
+                
+                <li><a href="/create_account" class="aa-register">Register</a></li>
+                <li><a href="/login" class="aa-login">Login</a></li>
+            {% endif %}
+        </ul>
+      </div>
+  </nav> 
+</section>
+<!-- End menu section -->
+      
+      <!--  <div id="navbar" class="navbar-collapse collapse">
           <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
             <li class="active"><a href="/">HOME</a></li>
              <li class="dropdown">
@@ -115,12 +159,13 @@
             <li><a href="contact">CONTACT</a></li>
            <li><a href="404">404 PAGE</a></li>
           </ul>                            
-        </div><!--/.nav-collapse -->       
+        </div>--><!--/.nav-collapse -->    
       </div>          
     </nav> 
   </section>
   <!-- End menu section -->
 
+  
   <!-- Start slider  -->
   <section id="aa-slider">
     <div class="aa-slider-area"> 
@@ -128,101 +173,16 @@
       <div class="aa-top-slider">
         <!-- Top slider single slide -->
         <div class="aa-top-slider-single">
-          <img src="static/img/slider/3.jpg" alt="img">
-          <!-- Top slider content -->
-          <div class="aa-top-slider-content">
-            <span class="aa-top-slider-catg">Duplex</span>
-            <h2 class="aa-top-slider-title">1560 Square Feet</h2>
-            <p class="aa-top-slider-location"><i class="fa fa-map-marker"></i>South Beach, Miami (USA)</p>
-            <span class="aa-top-slider-off">30% OFF</span>
-            <p class="aa-top-slider-price">$460,000</p>
-            <a href="#" class="aa-top-slider-btn">Read More <span class="fa fa-angle-double-right"></span></a>
-          </div>
-          <!-- / Top slider content -->
+          <img src="static/img/slider/biddinghouse3.jpg" alt="img">
         </div>
-        <!-- / Top slider single slide -->
-        <!-- Top slider single slide -->
-        <div class="aa-top-slider-single">
-          <img src="static/img/slider/2.jpg" alt="img">
-          <!-- Top slider content -->
-          <div class="aa-top-slider-content">
-            <span class="aa-top-slider-catg">Duplex</span>
-            <h2 class="aa-top-slider-title">1560 Square Feet</h2>
-            <p class="aa-top-slider-location"><i class="fa fa-map-marker"></i>South Beach, Miami (USA)</p>
-            <span class="aa-top-slider-off">30% OFF</span>
-            <p class="aa-top-slider-price">$460,000</p>
-            <a href="#" class="aa-top-slider-btn">Read More <span class="fa fa-angle-double-right"></span></a>
-          </div>
-          <!-- / Top slider content -->
-        </div>
-        <!-- / Top slider single slide -->
-        <!-- Top slider single slide -->
-        <div class="aa-top-slider-single">
-          <img src="static/img/slider/1.jpg" alt="img">
-          <!-- Top slider content -->
-          <div class="aa-top-slider-content">
-            <span class="aa-top-slider-catg">Duplex</span>
-            <h2 class="aa-top-slider-title">1560 Square Feet</h2>
-            <p class="aa-top-slider-location"><i class="fa fa-map-marker"></i>South Beach, Miami (USA)</p>
-            <span class="aa-top-slider-off">30% OFF</span>
-            <p class="aa-top-slider-price">$460,000</p>
-            <a href="#" class="aa-top-slider-btn">Read More <span class="fa fa-angle-double-right"></span></a>
-          </div>
-          <!-- / Top slider content -->
-        </div>
-        <!-- / Top slider single slide -->       
-         <!-- Top slider single slide -->
-        <div class="aa-top-slider-single">
-          <img src="static/img/slider/5.jpg" alt="img">
-          <!-- Top slider content -->
-          <div class="aa-top-slider-content">
-            <span class="aa-top-slider-catg">Duplex</span>
-            <h2 class="aa-top-slider-title">1560 Square Feet</h2>
-            <p class="aa-top-slider-location"><i class="fa fa-map-marker"></i>South Beach, Miami (USA)</p>
-            <span class="aa-top-slider-off">30% OFF</span>
-            <p class="aa-top-slider-price">$460,000</p>
-            <a href="#" class="aa-top-slider-btn">Read More <span class="fa fa-angle-double-right"></span></a>
-          </div>
-          <!-- / Top slider content -->
-        </div>
-        <!-- / Top slider single slide -->        
-         <!-- Top slider single slide -->
-        <div class="aa-top-slider-single">
-          <img src="static/img/slider/4.jpg" alt="img">
-          <!-- Top slider content -->
-          <div class="aa-top-slider-content">
-            <span class="aa-top-slider-catg">Duplex</span>
-            <h2 class="aa-top-slider-title">1560 Square Feet</h2>
-            <p class="aa-top-slider-location"><i class="fa fa-map-marker"></i>South Beach, Miami (USA)</p>
-            <span class="aa-top-slider-off">30% OFF</span>
-            <p class="aa-top-slider-price">$460,000</p>
-            <a href="#" class="aa-top-slider-btn">Read More <span class="fa fa-angle-double-right"></span></a>
-          </div>
-          <!-- / Top slider content -->
-        </div>
-        <!-- / Top slider single slide -->
-         <!-- Top slider single slide -->
-        <div class="aa-top-slider-single">
-          <img src="static/img/slider/6.jpg" alt="img">
-          <!-- Top slider content -->
-          <div class="aa-top-slider-content">
-            <span class="aa-top-slider-catg">Duplex</span>
-            <h2 class="aa-top-slider-title">1560 Square Feet</h2>
-            <p class="aa-top-slider-location"><i class="fa fa-map-marker"></i>South Beach, Miami (USA)</p>
-            <span class="aa-top-slider-off">30% OFF</span>
-            <p class="aa-top-slider-price">$460,000</p>
-            <a href="#" class="aa-top-slider-btn">Read More <span class="fa fa-angle-double-right"></span></a>
-          </div>
-          <!-- / Top slider content -->
-        </div>
-        <!-- / Top slider single slide -->
       </div>
     </div>
   </section>
   <!-- End slider  -->
 
+  
   <!-- Advance Search -->
-  <section id="aa-advance-search">
+  <!-- <section id="aa-advance-search">
     <div class="container">
       <div class="aa-advance-search-area">
         <div class="form">
@@ -276,7 +236,7 @@
          <div class="aa-advance-search-bottom">
            <div class="row">
             <div class="col-md-6">
-              <div class="aa-single-filter-search"><!-- Within custom.js to change the values -->
+              <div class="aa-single-filter-search">
                 <span>AREA (SQ)</span>
                 <span>FROM</span>
                 <span id="skip-value-lower" class="example-val">0.00</span>
@@ -287,7 +247,7 @@
               </div>
             </div>
             <div class="col-md-6">
-              <div class="aa-single-filter-search"> <!-- Within custom.js to change the values -->
+              <div class="aa-single-filter-search">
                 <span>PRICE ($)</span>
                 <span>FROM</span>
                 <span id="skip-value-lower2" class="example-val">0.00</span>
@@ -302,10 +262,10 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
   <!-- / Advance Search -->
-
-  <!-- About us -->
+    
+  <!-- About us 
   <section id="aa-about-us">
     <div class="container">
       <div class="row">
@@ -340,7 +300,7 @@
       </div>
     </div>
   </section>
-  <!-- / About us -->
+   / About us -->
 
   <!-- Latest property -->
   <section id="aa-latest-property">
@@ -601,9 +561,9 @@
       <div class="row">
         <div class="col-md-12">
           <div class="aa-promo-banner-area">
-            <h3>Find Your Best Property</h3>
-            <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Doloribus, ex illum corporis quibusdam numquam quisquam optio explicabo. Officiis odit quia odio dignissimos eius repellat id!</p>
-            <a href="#" class="aa-view-btn">View Details</a>
+            <h3>Fight for Your Best Agent or Properties Here</h3>
+            <p>Find your Best and Lowest Priced Commision Property Agent or compete with other agents with Attractive Commision rates here WITH US</p>
+            <a href="/list-property" class="aa-view-btn">View Details</a>
           </div>
         </div>
       </div>
@@ -628,16 +588,13 @@
                 <li>
                   <div class="aa-single-agents">
                     <div class="aa-agents-img">
-                      <img src="static/img/agents/agent-1.png" alt="agent member image">
+                      <img src="static/img/agents/maleagent1.jpg" alt="agent member image">
                     </div>
                     <div class="aa-agetns-info">
                       <h4><a href="#">Philip Smith</a></h4>
                       <span>Top Agent</span>
                       <div class="aa-agent-social">
-                        <a href="#"><i class="fa fa-facebook"></i></a>
-                        <a href="#"><i class="fa fa-twitter"></i></a>
-                        <a href="#"><i class="fa fa-linkedin"></i></a>
-                        <a href="#"><i class="fa fa-google-plus"></i></a>
+                        <a href="#">Past Transactions<i class="fa fa-facebook"></i></a>s
                       </div>
                     </div>
                   </div>
@@ -651,7 +608,7 @@
                       <h4><a href="#">Adam Barney</a></h4>
                       <span>Expert Agent</span>
                       <div class="aa-agent-social">
-                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#">Past Transactions<i class="fa fa-facebook"></i></a>
                         <a href="#"><i class="fa fa-twitter"></i></a>
                         <a href="#"><i class="fa fa-linkedin"></i></a>
                         <a href="#"><i class="fa fa-google-plus"></i></a>
@@ -719,7 +676,7 @@
                       <h4><a href="#">Adam Barney</a></h4>
                       <span>Expert Agent</span>
                       <div class="aa-agent-social">
-                        <a href="#"><i class="fa fa-facebook"></i></a>
+                        <a href="#">Past Transaction<i class="fa fa-facebook"></i></a>
                         <a href="#"><i class="fa fa-twitter"></i></a>
                         <a href="#"><i class="fa fa-linkedin"></i></a>
                         <a href="#"><i class="fa fa-google-plus"></i></a>
@@ -770,74 +727,8 @@
   </section>
   <!-- / Our Agent Section-->
 
-  <!-- Client Testimonial -->
-  <section id="aa-client-testimonial">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="aa-client-testimonial-area">
-            <div class="aa-title">
-              <h2>What Client Say</h2>
-              <span></span>
-              <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Necessitatibus eaque quas debitis animi ipsum, veritatis!</p>
-            </div>
-            <!-- testimonial content -->
-            <div class="aa-testimonial-content">
-              <!-- testimonial slider -->
-              <ul class="aa-testimonial-slider">
-                <li>
-                  <div class="aa-testimonial-single">
-                    <div class="aa-testimonial-img">
-                      <img src="static/img/testimonial-1.png" alt="testimonial img">
-                    </div>
-                    <div class="aa-testimonial-info">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate consequuntur ducimus cumque iure modi nesciunt recusandae eligendi vitae voluptatibus, voluptatum tempore, ipsum nisi perspiciatis. Rerum nesciunt fuga ab natus, dolorem?</p>
-                    </div>
-                    <div class="aa-testimonial-bio">
-                      <p>David Muller</p>
-                      <span>Web Designer</span>
-                    </div>
-                  </div>
-                </li>
-                 <li>
-                  <div class="aa-testimonial-single">
-                    <div class="aa-testimonial-img">
-                      <img src="static/img/testimonial-3.png" alt="testimonial img">
-                    </div>
-                    <div class="aa-testimonial-info">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate consequuntur ducimus cumque iure modi nesciunt recusandae eligendi vitae voluptatibus, voluptatum tempore, ipsum nisi perspiciatis. Rerum nesciunt fuga ab natus, dolorem?</p>
-                    </div>
-                    <div class="aa-testimonial-bio">
-                      <p>David Muller</p>
-                      <span>Web Designer</span>
-                    </div>
-                  </div>
-                </li>
-                 <li>
-                  <div class="aa-testimonial-single">
-                    <div class="aa-testimonial-img">
-                      <img src="static/img/testimonial-2.png" alt="testimonial img">
-                    </div>
-                    <div class="aa-testimonial-info">
-                      <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Cupiditate consequuntur ducimus cumque iure modi nesciunt recusandae eligendi vitae voluptatibus, voluptatum tempore, ipsum nisi perspiciatis. Rerum nesciunt fuga ab natus, dolorem?</p>
-                    </div>
-                    <div class="aa-testimonial-bio">
-                      <p>David Muller</p>
-                      <span>Web Designer</span>
-                    </div>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-  <!-- Client Testimonial -->
-
   <!-- Client brand -->
-  <section id="aa-client-brand">
+  <!-- <section id="aa-client-brand">
     <div class="container">
       <div class="row">
         <div class="col-md-12">
@@ -898,10 +789,10 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
   <!-- / Client brand -->
   <!-- Latest blog -->
-  <section id="aa-latest-blog">
+  <!-- <section id="aa-latest-blog">
     <div class="container">
       <div class="row">
         <div class="col-md-12">
@@ -913,7 +804,7 @@
             </div>
             <div class="aa-latest-blog-content">
               <div class="row">
-                <!-- start single blog -->
+
                 <div class="col-md-4">
                   <article class="aa-blog-single">
                     <figure class="aa-blog-img">
@@ -931,7 +822,6 @@
                    
                   </article>
                 </div>
-                <!-- start single blog -->
                 <div class="col-md-4">
                   <article class="aa-blog-single">
                     <figure class="aa-blog-img">
@@ -948,7 +838,6 @@
                     </div>                   
                   </article>
                 </div>
-                <!-- start single blog -->
                 <div class="col-md-4">
                   <article class="aa-blog-single">
                     <figure class="aa-blog-img">
@@ -971,7 +860,7 @@
         </div>
       </div>
     </div>
-  </section>
+  </section> -->
   <!-- / Latest blog -->
 
   <!-- Footer -->
