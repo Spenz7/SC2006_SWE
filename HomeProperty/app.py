@@ -186,8 +186,17 @@ def view_your_property():
     if 'username' not in session or session.get('user_type') != 'seller':
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
+    
+    # Database connection
+    conn = sqlite3.connect('accounts.db')
+    conn.row_factory = sqlite3.Row  
+    c = conn.cursor()
+        
+    username = session['username']
+    properties = c.execute("SELECT * FROM listings WHERE seller_username = ?", (username,)).fetchall()
+    
 
-    return render_template('view_your_property.html')
+    return render_template('view_your_property.html',properties=properties)
 
 
 @app.route('/list-property', methods=['GET', 'POST'])

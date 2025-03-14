@@ -171,62 +171,38 @@
             <!-- Start properties content body -->
             <div class="aa-properties-content-body">
               <ul class="aa-properties-nav">
-                <li>
-                  <article class="aa-properties-item">
-                    <a class="aa-properties-item-img" href="#">
-                      <img alt="img" src="static/img/item/6.jpg">
-                      <!-- src="static/img/item/6.jpg" -->
-                    </a>
-                    <div class="aa-properties-item-content">
-                      <div class="aa-properties-info">
-                        <span>5 Rooms</span>
-                        <span>2 Beds</span>
-                        <span>3 Baths</span>
-                        <span>1100 SQ FT</span>
-                      </div>
-                      <div class="aa-properties-about">
-                        <h3><a href="#">Appartment at Bishan St 11</a></h3>
-                        <p>This segment is just hardcoded for now, waiting to link with database for each seller to have unique property details to display</p>                      
-                      </div>
-                      <div class="aa-properties-detial">
-                        <span class="aa-price">
-                          $35000
-                        </span>
-                        <a class="aa-secondary-btn" href="#">View Details</a>
-                      </div>
-                    </div>
-                  </article>
-                </li>
-                <li>
-                  <article class="aa-properties-item">
-                    <a class="aa-properties-item-img" href="#">
-                      <img alt="img" src="static/img/item/1.jpg">
-                      <!-- src="static/img/item/1.jpg" -->
-                    </a>
-                    <div class="aa-tag sold-out">
-                      Sold Out
-                    </div>
-                    <div class="aa-properties-item-content">
-                      <div class="aa-properties-info">
-                        <span>5 Rooms</span>
-                        <span>2 Beds</span>
-                        <span>3 Baths</span>
-                        <span>1100 SQ FT</span>
-                      </div>
-                      <div class="aa-properties-about">
-                        <h3><a href="#">Appartment at Sembawang Cres</a></h3>
-                        <p>This segment is just hardcoded for now, waiting to link with database for each seller to have unique property details to display</p>                      
-                      </div>
-                      <div class="aa-properties-detial">
-                        <span class="aa-price">
-                          $35000
-                        </span>
-                        <a class="aa-secondary-btn" href="#">View Details</a>
-                      </div>
-                    </div>
-                  </article>
-                </li>
-              </ul>
+                {% if properties %}
+                    {% for property in properties %}
+                        <li>
+                            <article class="aa-properties-item">
+                                <a class="aa-properties-item-img" href="#">
+                                    <img alt="img" src="{{ url_for('static', filename='img/item/6.jpg') }}">
+                                </a>
+                                <div class="aa-properties-item-content">
+                                    <div class="aa-properties-info">
+                                        <span>{{ property['flat_type'] }}</span>
+                                        <span>{{ property['town'] }}</span>
+                                        <span>{{ property['floor_area'] }} SQ FT</span>
+                                        <span>{{ property['years_remaining'] }} years remaining</span>
+                                    </div>
+                                    <div class="aa-properties-about">
+                                        <h3><a href="#">Flat in {{ property['street_name'] }}</a></h3>
+                                        <p>This part should be trying to fetch data from the database, but not sure what to put here yet, might just change the UI for this part to make it cleaner, unless we want to include a part where seller input flat description</p>
+                                    </div>
+                                    <div class="aa-properties-detial">
+                                        <span class="aa-price">
+                                            ${{ property['listing_price'] }}
+                                        </span>
+                                        <a class="aa-secondary-btn" href="#" onclick="loadPropertyDetails({{ property['id'] }})">More Details</a>
+                                    </div>
+                                </div>
+                            </article>
+                        </li>
+                    {% endfor %}
+                {% else %}
+                    <p style="color: black;"; class="text-center text-muted">No properties listed yet. Start listing your properties!</p>
+                {% endif %}
+            </ul>            
             </div>
             <!-- Start properties content bottom -->
             <div class="aa-properties-content-bottom">
