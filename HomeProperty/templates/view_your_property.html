@@ -9,8 +9,6 @@
     <!-- Favicon -->
     <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
     
-    
-       
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
@@ -269,6 +267,48 @@
     </div>
   </footer>
   <!-- / Footer -->
+
+  <!-- Modal -->
+<div class="modal fade" id="propertyModal" tabindex="-1" role="dialog" aria-labelledby="propertyModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="color: black;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="propertyModalLabel">Property Details</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      
+      <div class="modal-body">
+        <div id="property-details">
+          <p><strong>Flat Type:</strong> <span id="modal-flat-type"></span></p>
+          <p><strong>Town:</strong> <span id="modal-town"></span></p>
+          <p><strong>Street Name:</strong> <span id="modal-street-name"></span></p>
+          <p><strong>Floor Area:</strong> <span id="modal-floor-area"></span> SQ FT</p>
+          <p><strong>Min Bid Interval:</strong> <span id="modal-min-bid-interval">%</span></p>
+          <p><strong>Years Remaining:</strong> <span id="modal-years-remaining"></span></p>
+          <p><strong>Listing Price:</strong> $<span id="modal-listing-price"></span></p>
+        </div>
+        
+        <hr>
+        <h5>Current Bidders</h5>
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Bidder</th>
+              <th>Bid Amount</th>
+              <th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="bidder-list">
+            <!-- Bidder info will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 
 

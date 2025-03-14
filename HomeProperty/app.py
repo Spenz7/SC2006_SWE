@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 import sqlite3
 import re
 import os
@@ -197,6 +197,37 @@ def view_your_property():
     
 
     return render_template('view_your_property.html',properties=properties)
+
+@app.route('/get_property_details/<int:id>')
+def get_property_details(id):
+    if 'username' not in session or session.get('user_type') != 'seller':
+        return jsonify({'error': 'Unauthorized access'}), 403
+    
+    conn = sqlite3.connect('accounts.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+    
+    # Get property details
+    property = c.execute("SELECT * FROM listings WHERE id = ?", (id,)).fetchone()
+    
+    if not property:
+        return jsonify({'error': 'Property not found'}), 404
+    
+    conn.close()
+
+    # ✅ Hardcoded bidder data for testing
+    bidder_data = [
+        {'bidder_username': 'PropAgent1', 'bid_amount': 1.5, 'review': '4.5/5'},
+        {'bidder_username': 'PropAgent2', 'bid_amount': 1.8, 'review': '5/5'}
+        ]
+    
+    property_data = dict(property)
+    
+    return jsonify({
+        'property': property_data,
+        'bidders': bidder_data
+    })
+
 
 
 @app.route('/list-property', methods=['GET', 'POST'])

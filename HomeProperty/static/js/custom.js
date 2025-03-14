@@ -353,6 +353,57 @@ jQuery(function($){
       ]
     }); 
 
+    function loadPropertyDetails(propertyId) {
+      $.ajax({
+          url: `/get_property_details/${propertyId}`,  
+          type: 'GET',
+          success: function(data) {
+              if (data.error) {
+                  alert(data.error);
+                  return;
+              }
+  
+              // Load property details into modal
+              $('#modal-flat-type').text(data.property.flat_type);
+              $('#modal-town').text(data.property.town);
+              $('#modal-street-name').text(data.property.street_name);
+              $('#modal-floor-area').text(data.property.floor_area);
+              $('#modal-min-bid-interval').text(data.property.min_bid_interval);
+              $('#modal-years-remaining').text(data.property.years_remaining);
+              $('#modal-listing-price').text(data.property.listing_price);
+  
+              // Clear existing rows in the table
+              $('#bidder-list').empty();
+  
+              if (data.bidders.length > 0) {
+                  data.bidders.forEach(bidder => {
+                      $('#bidder-list').append(`
+                          <tr>
+                              <td>${bidder.bidder_username}</td>
+                              <td>$${bidder.bid_amount}</td>
+                              <td>${bidder.review}</td>
+                          </tr>
+                      `);
+                  });
+              } else {
+                  $('#bidder-list').append(`
+                      <tr>
+                          <td colspan="3" class="text-center">No bids yet</td>
+                      </tr>
+                  `);
+              }
+  
+              // Show the modal
+              $('#propertyModal').modal('show');
+          },
+          error: function() {
+              alert("Failed to load property details. Please try again.");
+          }
+      });
+  }
+  window.loadPropertyDetails = loadPropertyDetails;
+
+
  
 });
 
