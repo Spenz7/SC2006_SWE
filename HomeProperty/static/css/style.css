@@ -833,6 +833,7 @@ img {
   padding: 10px;
   width: 100%;
   text-align: left;
+  color: #000000;
 }
 .aa-properties-item .aa-properties-item-content .aa-properties-info span {
   margin: 0px 5px;
@@ -848,6 +849,7 @@ img {
   margin-top: 0px;
 }
 .aa-properties-item .aa-properties-item-content .aa-properties-about p {
+  color: black;
   font-size: 14px;
 }
 .aa-properties-item .aa-properties-item-content .aa-properties-detial {
@@ -861,6 +863,7 @@ img {
   float: left;
   font-size: 18px;
   padding: 3px 0;
+  color: black;
 }
 .aa-properties-item .aa-properties-item-content .aa-properties-detial a {
   float: right;
@@ -1415,6 +1418,7 @@ img {
 }
 
 #aa-properties {
+  background-color: #F8F8F8;
   display: inline;
   float: left;
   width: 100%;
