@@ -32,8 +32,109 @@ def init_db():
     conn.commit()
     conn.close()
 
-init_db() #re-run this whenever u wan del existing db
+def init_listings_db():
+    conn = sqlite3.connect('listings.db')
+    c = conn.cursor()
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS listings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            seller_username TEXT NOT NULL,
+            flat_type TEXT NOT NULL,
+            town TEXT NOT NULL,
+            street_name TEXT NOT NULL,
+            floor_area INTEGER NOT NULL,
+            min_bid_interval REAL NOT NULL,
+            years_remaining INTEGER NOT NULL,
+            listing_price REAL NOT NULL
+        )
+    ''')
+    conn.commit()
+    conn.close()
 
+init_db() #re-run this whenever u wan del existing db
+init_listings_db()
+
+import sqlite3
+import requests
+
+def init_gov_data_db():
+    conn = sqlite3.connect('gov_data.db')
+    c = conn.cursor()
+
+    # ✅ Create table for past resale prices
+    c.execute('''
+        CREATE TABLE IF NOT EXISTS past_prices (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            month TEXT NOT NULL,
+            town TEXT NOT NULL,
+            flat_type TEXT NOT NULL,
+            street_name TEXT NOT NULL,
+            floor_area INTEGER NOT NULL,
+            remaining_lease INTEGER NOT NULL,
+            resale_price REAL NOT NULL
+        )
+    ''')
+
+    conn.commit()
+    conn.close()
+
+def fetch_and_store_gov_data():
+    conn = sqlite3.connect('gov_data.db')
+    c = conn.cursor()
+
+    # ✅ Fetch resale data from data.gov.sg API
+    dataset_id = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc"  # Replace with correct dataset ID
+    url = f"https://data.gov.sg/datasets?query=resale+prifecs&page=1&resultId=d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
+
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        if 'result' in data and 'records' in data['result']:
+            records = data['result']['records']
+
+            for record in records:
+                # Insert into the database
+                c.execute('''
+                    INSERT INTO past_prices (month, town, flat_type, street_name, floor_area, remaining_lease, resale_price)
+                    VALUES (?, ?, ?, ?, ?, ?, ?)''',
+                    (record['month'], record['town'], record['flat_type'], record['street_name'], 
+                     record['floor_area_sqm'], record['remaining_lease'], record['resale_price'])
+                )
+            
+            conn.commit()
+            print("✅ Government resale data imported successfully!")
+        else:
+            print("⚠ No records found in API response.")
+
+    except Exception as e:
+        print("❌ Error fetching government data:", e)
+
+    conn.close()
+
+def find_similar_past_prices(flat_type, town, floor_area, remaining_lease):
+    conn = sqlite3.connect('gov_data.db')
+    c = conn.cursor()
+
+    # ✅ Find 5 most similar past resale prices
+    c.execute('''
+        SELECT * FROM past_prices 
+        WHERE flat_type = ? 
+        AND town = ?
+        AND ABS(floor_area - ?) <= 5
+        AND ABS(remaining_lease - ?) <= 5
+        ORDER BY ABS(resale_price) ASC
+        LIMIT 5
+    ''', (flat_type, town, floor_area, remaining_lease))
+
+    similar_houses = c.fetchall()
+    conn.close()
+
+    return similar_houses
+
+# Run these functions when initializing the app
+init_gov_data_db()
+fetch_and_store_gov_data()
 #go to http://localhost:5000/view_accounts to view
 @app.route('/view_accounts')
 def view_accounts():
@@ -188,7 +289,7 @@ def view_your_property():
         return redirect(url_for('login'))
     
     # Database connection
-    conn = sqlite3.connect('accounts.db')
+    conn = sqlite3.connect('listings.db')
     conn.row_factory = sqlite3.Row  
     c = conn.cursor()
         
@@ -203,7 +304,7 @@ def get_property_details(id):
     if 'username' not in session or session.get('user_type') != 'seller':
         return jsonify({'error': 'Unauthorized access'}), 403
     
-    conn = sqlite3.connect('accounts.db')
+    conn = sqlite3.connect('listings.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
     
@@ -239,6 +340,8 @@ def list_property():
         flash("Only sellers can list properties!", "danger")
         return redirect(url_for('index'))  # Redirect unauthorized users
 
+        similar_houses = []
+
     if request.method == 'POST':
         # Extract form data
         flat_type = request.form.get('flat_type')
@@ -263,12 +366,19 @@ def list_property():
             flash("Please enter valid numerical values.", "danger")
             return redirect(url_for('list_property'))
 
+
+        similar_houses = find_similar_past_prices(flat_type, town, floor_area, years_remaining)
+        if not similar_houses:
+            flash("⚠ No exact matches found. Showing similar listings.", "warning")
+                
         # Database connection
-        conn = sqlite3.connect('accounts.db')
+        conn = sqlite3.connect('listings.db')
         c = conn.cursor()
 
         # Create a listings table if it doesn't exist
-        c.execute('''CREATE TABLE IF NOT EXISTS listings (
+       # Commenting out table creation since listings.db is already set up
+        
+        """c.execute('''CREATE TABLE IF NOT EXISTS listings (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
                         seller_username TEXT NOT NULL,
                         flat_type TEXT NOT NULL,
@@ -278,8 +388,8 @@ def list_property():
                         min_bid_interval REAL NOT NULL,
                         years_remaining INTEGER NOT NULL,
                         listing_price REAL NOT NULL
-                    )''')
-
+                    )''')"""
+    
         # Insert the property listing
         c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, min_bid_interval, years_remaining, listing_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                   (session['username'], flat_type, town, street_name, floor_area, min_bid_interval, years_remaining, listing_price))
@@ -345,4 +455,6 @@ def index():
 
 if __name__ == '__main__':
     init_db()
+    init_listings_db()
+    init_gov_data_db()
     app.run(debug=True)

@@ -210,6 +210,33 @@
             <button type="button" class="btn btn-primary" onclick="fetchPastPrices()">Fetch Past Prices</button>
             <span id="past-price-display" style="margin-left: 15px; font-weight: bold; color: green;"></span>
         </div>
+        
+        <script>
+          function fetchPastPrices() {
+              const apiUrl = "https://data.gov.sg/api/action/datastore_search?resource_id=d_8b84c4ee58e3cfc0ece0d773c8ca6abc&limit=5";
+      
+              fetch(apiUrl)
+                  .then(response => response.json())
+                  .then(data => {
+                      if (data.result && data.result.records.length > 0) {
+                          let prices = data.result.records
+                              .filter(record => record.resale_price) // Ensure resale_price exists
+                              .map(record => `$${record.resale_price.toLocaleString()}`)
+                              .join(", ");
+      
+                          document.getElementById("past-price-display").textContent = `Past Prices: ${prices}`;
+                      } else {
+                          document.getElementById("past-price-display").textContent = "No data found";
+                          document.getElementById("past-price-display").style.color = "red";
+                      }
+                  })
+                  .catch(error => {
+                      console.error("Error fetching past prices:", error);
+                      document.getElementById("past-price-display").textContent = "Error fetching data";
+                      document.getElementById("past-price-display").style.color = "red";
+                  });
+          }
+      </script>
 
           <div class="form-group" id="past-prices" style="display:none;">
               <label>Past Prices (Government Data):</label>
@@ -297,21 +324,6 @@
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
   <script src="{{ url_for('static', filename='js/streetname.js') }}"></script>
 
-  <script>
-    function fetchPastPrices() {
-        // Simulate fetching data from an API (replace this with an actual API call)
-        fetch('/api/get_past_price')  // Replace with actual API endpoint
-            .then(response => response.json())
-            .then(data => {
-                // Assume API returns { "past_price": "500,000" }
-                document.getElementById("past-price-display").textContent = `Past Price: $${data.past_price}`;
-            })
-            .catch(error => {
-                console.error("Error fetching past prices:", error);
-                document.getElementById("past-price-display").textContent = "Error fetching data";
-                document.getElementById("past-price-display").style.color = "red";
-            });
-    }
-</script>
+
   </body>
 </html>
