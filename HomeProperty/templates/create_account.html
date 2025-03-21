@@ -65,8 +65,22 @@
                     <label for="agent-id">Agent Registration Number <span class="required">*</span></label>
                     <input type="text" name="agent_id" id="agent-id">
                 </div>
+                <div class="aa-single-field">
+                    <label for="phone_number">Phone Number <span class="required">*</span></label>
+                    <div class="input-group">
+                        <input type="text" name="phone_number" id="phone_number" required="required" placeholder="e.g. 91234567" class="form-control">
+                        <button type="button" id="get-otp" class="btn btn-primary">Get OTP</button>
+                    </div>
+                </div>
+                <!-- Remove the show_otp block and always render the OTP input field with style="display: none" -->
+                <div class="aa-single-field">
+                  <label for="otp">Enter OTP <span class="required">*</span></label>
+                  <input type="text" name="otp" id="otp" required="required" style="display: none;">
+                </div>
+
+
                 <div class="aa-single-submit">
-                    <input type="submit" value="Create Account" name="submit"> 
+                    <input type="submit" value="Create Account" name="submit">
                     <p>Already have an account? <a href="/login">Login here!</a></p>
                 </div>
               </form>     
@@ -76,16 +90,59 @@
       </div>
     </div>
   </section> 
+  
+  <!-- JavaScript to handle OTP generation -->
   <script>
     function goBack() {
       window.location.href = "/";
     }
+
     function toggleAgentID() {
       var userType = document.getElementById("user-type").value;
       var agentField = document.getElementById("agent-id-field");
       agentField.style.display = userType === "agent" ? "block" : "none";
     }
+
+    document.getElementById("get-otp").addEventListener("click", function() {
+      var phoneNumber = document.getElementById("phone_number").value.trim();
+
+      if (phoneNumber.length === 8) {
+          // Add +65 for Singapore phone number
+          phoneNumber = '+65' + phoneNumber;
+          
+          // Make an AJAX request to send the OTP
+          fetch('/send_otp', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({ phone_number: phoneNumber })
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  alert("OTP sent to " + phoneNumber);
+                  // Show OTP input field after successful OTP send
+                  var otpInput = document.getElementById("otp");
+                  if (otpInput) {
+                      otpInput.style.display = "block";
+                  }
+              } else {
+                  alert("Failed to send OTP: " + data.message);
+              }
+          })
+          .catch(err => {
+              alert("Error: " + err);
+          });
+      } else {
+          alert("Please enter a valid 8-digit phone number.");
+      }
+    });
+
+
+
   </script>
+
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
   <script src="{{ url_for('static', filename='js/slick.js') }}"></script>

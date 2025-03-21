@@ -3,6 +3,9 @@ import sqlite3
 import re
 import os
 import requests
+from twilio.rest import Client #need for SMS OTP
+import random
+import time
 
 app = Flask(__name__)
 
@@ -15,9 +18,9 @@ def init_db():
     c = conn.cursor()
 
     # Drop the existing users table if needed (optional)
-   # c.execute("DROP TABLE IF EXISTS users")
+    c.execute("DROP TABLE IF EXISTS users")
 
-    # Create the users table with agent_registration_no
+    # Create the users table with phone_number and ensure it's unique
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,7 +28,8 @@ def init_db():
         username TEXT UNIQUE NOT NULL,
         password TEXT NOT NULL,
         user_type TEXT NOT NULL CHECK(user_type IN ('seller', 'agent')),
-        agent_id TEXT UNIQUE DEFAULT NULL  -- Allow NULL for sellers
+        agent_id TEXT UNIQUE DEFAULT NULL,  -- Allow NULL for sellers
+        phone_number TEXT UNIQUE NOT NULL  -- Ensure no duplicates
         )
     ''')
 
@@ -178,50 +182,131 @@ def check_agent_id(agent_id):
     
     return False  # Agent ID not found
 
+# Twilio credentials
+account_sid = '***REMOVED***'  # Replace with your Twilio Account SID
+auth_token = '***REMOVED***'  # Replace with your Twilio Auth Token
+twilio_number = '***REMOVED***'  # Replace with your Twilio phone number
+
+def generate_otp():
+    otp = random.randint(100000, 999999)  # Generates a 6-digit OTP
+    return otp
+
+# Function to send OTP via SMS using Twilio
+def send_otp_sms(phone_number):
+    otp = generate_otp()
+    
+    # Store OTP in session
+    session['otp'] = otp
+    print("DEBUG: OTP stored in session:", session.get('otp'))  # Add this line to debug
+
+    # Create Twilio client
+    client = Client(account_sid, auth_token)
+    
+    # Send OTP SMS
+    message = client.messages.create(
+        body=f'Your OTP is {otp}',  # Message body
+        from_=twilio_number,  # Your Twilio phone number
+        to=phone_number  # The phone number to send OTP to
+    )
+    
+    return message.sid  # Optionally return SID for logging/debugging
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    try:
+        # Read JSON data
+        data = request.get_json()
+        phone_number = data['phone_number'].strip()
+
+        # Check if the phone number is valid (starts with +65 for Singapore)
+        if not phone_number.startswith('+65'):
+            return jsonify({'success': False, 'message': 'Phone number must start with +65.'}), 400
+
+        # Generate OTP and store in session
+        otp = generate_otp()
+        session['otp'] = otp
+
+        # Send OTP via Twilio
+        message_sid = send_otp_sms(phone_number)  # Use the function to send OTP SMS
+
+        # Return a success response
+        return jsonify({'success': True, 'message': 'OTP sent successfully.'})
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
     if request.method == 'POST':
         full_name = request.form['full_name'].strip()
         username = request.form['username'].strip()
         password = request.form['password'].strip()
-        user_type = request.form['user-type'].strip()  # Either 'seller' or 'agent'
+        confirm_password = request.form['confirm-password'].strip()
+        phone_number = request.form['phone_number'].strip()
+        user_type = request.form['user-type'].strip()
+
+        # Validate password match
+        if password != confirm_password:
+            error_message = "Passwords do not match."
+            return render_template('create_account.html', error_message=error_message)
         
+        # Prepend +65 if not present
+        if not phone_number.startswith('+65'):
+            phone_number = '+65' + phone_number
+
+        otp = request.form.get('otp')  # Get OTP from form
+        print("DEBUG: OTP entered:", otp)  # Add this line to debug
+        
+        if otp:
+            # Ensure OTP is treated as an integer
+            otp = int(otp)  # Convert OTP from form to integer
+            
+            if 'otp' not in session or session['otp'] != otp:
+                error_message = "Invalid OTP. Please try again."
+                return render_template('create_account.html', error_message=error_message)
+            
+            del session['otp']  # Clear OTP from session after successful verification
+
+
         # Initialize database connection
         conn = sqlite3.connect('accounts.db')
         c = conn.cursor()
 
         # Check if username already exists
         c.execute("SELECT * FROM users WHERE username=?", (username,))
-        existing_user = c.fetchone()
-        if existing_user:
+        if c.fetchone():
             conn.close()
             error_message = "Username already taken. Please choose another one."
             return render_template('create_account.html', error_message=error_message)
+        
+        # Check if phone number already exists
+        c.execute("SELECT * FROM users WHERE phone_number=?", (phone_number,))
+        if c.fetchone():
+            conn.close()
+            error_message = "Phone number already in use. Please use a different number."
+            return render_template('create_account.html', error_message=error_message)
 
-        # Separate handling for agents and sellers
+        # Insert into the database
         if user_type == 'seller':
-            # Directly insert seller account
-            c.execute("INSERT INTO users (full_name, username, password, user_type) VALUES (?, ?, ?, ?)",
-                      (full_name, username, password, user_type))
+            c.execute("INSERT INTO users (full_name, username, password, phone_number, user_type) VALUES (?, ?, ?, ?, ?) ",
+                      (full_name, username, password, phone_number, user_type))
         
         elif user_type == 'agent':
-            agent_id = request.form.get('agent_id', '').strip()  # Safely get the agent_id
+            agent_id = request.form.get('agent_id', '').strip()
             
-            # Ensure the agent_id is present when the user selects 'agent'
             if not agent_id:
                 conn.close()
                 error_message = "Agent registration number is required."
                 return render_template('create_account.html', error_message=error_message)
 
-            # Validate agent ID against data.gov.sg API
             if not check_agent_id(agent_id):
                 conn.close()
                 error_message = "Invalid agent registration number. Please enter a valid ID."
                 return render_template('create_account.html', error_message=error_message)
 
-            # If valid, insert agent account
-            c.execute("INSERT INTO users (full_name, username, password, user_type, agent_id) VALUES (?, ?, ?, ?, ?)",
-                      (full_name, username, password, user_type, agent_id))
+            c.execute("INSERT INTO users (full_name, username, password, phone_number, user_type, agent_id) VALUES (?, ?, ?, ?, ?, ?) ",
+                      (full_name, username, password, phone_number, user_type, agent_id))
         
         else:
             conn.close()
@@ -233,12 +318,12 @@ def create_account():
         conn.close()
 
         flash("Account created successfully!", "success")
-        return redirect(url_for('login'))
+        return redirect(url_for('login'))  # Redirect to login page after successful account creation
 
-    return render_template('create_account.html')
-
-
-
+    else:
+        # Display the account creation form with OTP field
+        phone_number = request.args.get('phone_number')
+        return render_template('create_account.html', show_otp=True, phone_number=phone_number)
 
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
