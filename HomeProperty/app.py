@@ -55,7 +55,7 @@ def init_listings_db():
     conn.commit()
     conn.close()
 
-init_db() #re-run this whenever u wan del existing db
+#init_db() #re-run this whenever u wan del existing db
 init_listings_db()
 
 import sqlite3
