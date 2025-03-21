@@ -56,85 +56,96 @@ init_listings_db()
 
 import sqlite3
 import requests
+import time
 
-def init_gov_data_db():
-    conn = sqlite3.connect('gov_data.db')
-    c = conn.cursor()
+import requests
+import time
 
-    # ✅ Create table for past resale prices
-    c.execute('''
-        CREATE TABLE IF NOT EXISTS past_prices (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            month TEXT NOT NULL,
-            town TEXT NOT NULL,
-            flat_type TEXT NOT NULL,
-            street_name TEXT NOT NULL,
-            floor_area INTEGER NOT NULL,
-            remaining_lease INTEGER NOT NULL,
-            resale_price REAL NOT NULL
-        )
-    ''')
-
-    conn.commit()
-    conn.close()
-
-def fetch_and_store_gov_data():
-    conn = sqlite3.connect('gov_data.db')
-    c = conn.cursor()
-
-    # ✅ Fetch resale data from data.gov.sg API
-    dataset_id = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc"  # Replace with correct dataset ID
-    url = f"https://data.gov.sg/datasets?query=resale+prifecs&page=1&resultId=d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
-
+def parse_remaining_lease(lease_str):
     try:
-        response = requests.get(url)
-        data = response.json()
-        
-        if 'result' in data and 'records' in data['result']:
-            records = data['result']['records']
-
-            for record in records:
-                # Insert into the database
-                c.execute('''
-                    INSERT INTO past_prices (month, town, flat_type, street_name, floor_area, remaining_lease, resale_price)
-                    VALUES (?, ?, ?, ?, ?, ?, ?)''',
-                    (record['month'], record['town'], record['flat_type'], record['street_name'], 
-                     record['floor_area_sqm'], record['remaining_lease'], record['resale_price'])
-                )
-            
-            conn.commit()
-            print("✅ Government resale data imported successfully!")
-        else:
-            print("⚠ No records found in API response.")
-
-    except Exception as e:
-        print("❌ Error fetching government data:", e)
-
-    conn.close()
+        if not lease_str:
+            return 0
+        parts = lease_str.lower().replace("years", "").replace("year", "").replace("months", "").replace("month", "").split()
+        years = int(parts[0]) if len(parts) >= 1 else 0
+        months = int(parts[1]) if len(parts) >= 2 else 0
+        return round(years + months / 12, 1)
+    except:
+        return 0
 
 def find_similar_past_prices(flat_type, town, floor_area, remaining_lease):
-    conn = sqlite3.connect('gov_data.db')
-    c = conn.cursor()
+    dataset_id = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
+    base_url = "https://data.gov.sg/api/action/datastore_search"
 
-    # ✅ Find 5 most similar past resale prices
-    c.execute('''
-        SELECT * FROM past_prices 
-        WHERE flat_type = ? 
-        AND town = ?
-        AND ABS(floor_area - ?) <= 5
-        AND ABS(remaining_lease - ?) <= 5
-        ORDER BY ABS(resale_price) ASC
-        LIMIT 5
-    ''', (flat_type, town, floor_area, remaining_lease))
+    min_area = int(floor_area) - 10
+    max_area = int(floor_area) + 10
+    min_lease = int(remaining_lease) - 5
+    max_lease = int(remaining_lease) + 5
 
-    similar_houses = c.fetchall()
-    conn.close()
+    filtered = []
 
-    return similar_houses
+    for offset in range(0, 250000, 1000):
+        page_number = (offset // 1000) + 1
+        print(f"📦 Fetching records... Page {page_number}, Offset {offset}")
+        params = {
+            "resource_id": dataset_id,
+            "limit": 1000,
+            "offset": offset
+        }
 
+        try:
+            response = requests.get(base_url, params=params)
+            data = response.json()
+
+            if "result" not in data or "records" not in data["result"]:
+                break
+
+            records = data["result"]["records"]
+
+            for r in records:
+                try:
+                    area = float(r.get("floor_area_sqm", 0))
+                    lease = parse_remaining_lease(r.get("remaining_lease", "0"))
+                    resale_price = r.get("resale_price")
+
+                    if (
+                        r.get("flat_type") == flat_type and
+                        r.get("town") == town and
+                        resale_price and
+                        min_area <= area <= max_area and
+                        min_lease <= lease <= max_lease
+                    ):
+                        filtered.append(r)
+                        if len(filtered) >= 5:
+                            break  # Stop inner loop
+                except Exception as e:
+                    print("⚠️ Skipped record due to error:", e)
+                    continue
+
+            if len(filtered) >= 5:
+                break  # Stop outer loop
+
+            time.sleep(0.1)
+        except Exception as e:
+            print(f"❌ Error fetching or parsing data: {e}")
+            break
+
+    # Sort by most recent month (in case 5 were not the latest)
+    filtered.sort(key=lambda x: x.get("month", ""), reverse=True)
+
+    return [{
+        "month": r.get("month"),
+        "town": r.get("town"),
+        "flat_type": r.get("flat_type"),
+        "block": r.get("block"),
+        "street_name": r.get("street_name"),
+        "storey_range": r.get("storey_range"),
+        "floor_area_sqm": r.get("floor_area_sqm"),
+        "flat_model": r.get("flat_model"),
+        "remaining_lease": r.get("remaining_lease"),
+        "resale_price": r.get("resale_price")
+    } for r in filtered[:5]]
 # Run these functions when initializing the app
-init_gov_data_db()
-fetch_and_store_gov_data()
+
 #go to http://localhost:5000/view_accounts to view
 @app.route('/view_accounts')
 def view_accounts():
@@ -272,7 +283,10 @@ def logout():
     # Redirect the user to the login page after logging out
     return redirect(url_for('index'))    
 
-
+@app.route("/test_prices")
+def test_prices():
+    results = find_similar_past_prices("3 ROOM", "ANG MO KIO", 67, 62)
+    return jsonify(results)
  # For Seller dashboards
 @app.route('/seller_dashboard')
 def seller_dashboard():
@@ -404,7 +418,21 @@ def list_property():
 
 
 
+@app.route('/get_similar_prices')
+def get_similar_prices():
+    flat_type = request.args.get("flat_type")
+    town = request.args.get("town")
+    floor_area = request.args.get("floor_area")
+    years_remaining = request.args.get("years_remaining")
 
+    if not all([flat_type, town, floor_area, years_remaining]):
+        return jsonify({"error": "Missing parameters"}), 400
+
+    try:
+        results = find_similar_past_prices(flat_type, town, int(floor_area), int(years_remaining))
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 # For Agent Dashbaords.
 @app.route('/agent_dashboard')
@@ -456,5 +484,4 @@ def index():
 if __name__ == '__main__':
     init_db()
     init_listings_db()
-    init_gov_data_db()
     app.run(debug=True)
