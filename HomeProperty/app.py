@@ -20,7 +20,7 @@ def init_db():
     # Drop the existing users table if needed (optional)
     c.execute("DROP TABLE IF EXISTS users")
 
-    # Create the users table with phone_number and ensure it's unique
+    # phone number isn't unique cuz free trial twilio account only allows 1 phone number
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -29,7 +29,7 @@ def init_db():
         password TEXT NOT NULL,
         user_type TEXT NOT NULL CHECK(user_type IN ('seller', 'agent')),
         agent_id TEXT UNIQUE DEFAULT NULL,  -- Allow NULL for sellers
-        phone_number TEXT UNIQUE NOT NULL  -- Ensure no duplicates
+        phone_number TEXT NOT NULL  -- Ensure no duplicates
         )
     ''')
 
@@ -55,7 +55,7 @@ def init_listings_db():
     conn.commit()
     conn.close()
 
-#init_db() #re-run this whenever u wan del existing db
+init_db() #re-run this whenever u wan del existing db
 init_listings_db()
 
 import sqlite3
@@ -280,12 +280,13 @@ def create_account():
             error_message = "Username already taken. Please choose another one."
             return render_template('create_account.html', error_message=error_message)
         
-        # Check if phone number already exists
-        c.execute("SELECT * FROM users WHERE phone_number=?", (phone_number,))
-        if c.fetchone():
-            conn.close()
-            error_message = "Phone number already in use. Please use a different number."
-            return render_template('create_account.html', error_message=error_message)
+        # allow duplicate phone number cuz free trial account only allows 1 number
+        # # Check if phone number already exists
+        # c.execute("SELECT * FROM users WHERE phone_number=?", (phone_number,))
+        # if c.fetchone():
+        #     conn.close()
+        #     error_message = "Phone number already in use. Please use a different number."
+        #     return render_template('create_account.html', error_message=error_message)
 
         # Insert into the database
         if user_type == 'seller':
