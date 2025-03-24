@@ -37,6 +37,9 @@
         max-width: 100%;
         border-radius: 8px;
       }
+      .property-card h4, .property-card p {
+      color: black;
+      }
       .bid-button {
         width: 100%;
         padding: 10px;
@@ -200,7 +203,8 @@
       <header>
         <h1 class="text-center" style="text-align: center";>Property Bidding System</h1>
       </header>
-      <section class="container mt-4">
+
+      <!-- <section class="container mt-4">
         <div class="property-grid">
           <div class="property-card" >
             <img src="img/item1.jpg" alt="Property 1">
@@ -226,7 +230,27 @@
             <button class="bid-button" onclick="openBidModal('Beachside Villa', 25)"><strong>Bid</strong></button>
           </div>
         </div>
+      </section> -->
+
+      <section class="container mt-4">
+        <div class="property-grid">
+          {% for property in listings %}
+            <div class="property-card">
+              <img src="{{ url_for('static', filename='img/item1.jpg') }}" alt="Property Image">
+              <h4>{{ property['flat_type'] }} in {{ property['town'] }}</h4>
+              <p>{{ property['floor_area'] }} SQ FT | ${{ property['listing_price'] }}</p>
+              <p>Max Commission: {{ property['min_bid_interval'] }}%</p>
+              <button class="bid-button"
+                      data-title="{{ property['flat_type'] }} in {{ property['town'] }}"
+                      data-max="{{ property['min_bid_interval'] }}"
+                      onclick="handleBidClick(this)">
+                <strong>Bid</strong>
+              </button>
+            </div>
+          {% endfor %}
+        </div>
       </section>
+      
   
       <!-- Modal for Bidding -->
       <div id="bidModal" class="modal">
@@ -273,6 +297,12 @@
     <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
     <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
     <script>
+      function handleBidClick(btn) {
+          const title = btn.dataset.title;
+          const max = parseFloat(btn.dataset.max);
+          openBidModal(title, max);
+        }
+
         let currentProperty = '';
         let maxCommission = 0;
   

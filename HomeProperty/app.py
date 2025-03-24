@@ -387,17 +387,31 @@ def view_your_property():
     if 'username' not in session or session.get('user_type') != 'seller':
         flash("Access denied!", "danger")
         return redirect(url_for('login'))
-    
-    # Database connection
-    conn = sqlite3.connect('listings.db')
-    conn.row_factory = sqlite3.Row  
-    c = conn.cursor()
-        
-    username = session['username']
-    properties = c.execute("SELECT * FROM listings WHERE seller_username = ?", (username,)).fetchall()
-    
 
-    return render_template('view_your_property.html',properties=properties)
+    username = session['username']
+
+    try:
+        # Connect to the database
+        conn = sqlite3.connect('listings.db')
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        # Check if 'listings' table exists
+        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='listings'")
+        if not c.fetchone():
+            flash("No properties have been listed yet. Please list a property first.", "warning")
+            return redirect(url_for('list_property'))
+
+        # Fetch seller's properties
+        properties = c.execute("SELECT * FROM listings WHERE seller_username = ?", (username,)).fetchall()
+        return render_template('view_your_property.html', properties=properties)
+
+    except Exception as e:
+        flash(f"An unexpected error occurred: {str(e)}", "danger")
+        return redirect(url_for('seller_dashboard'))
+
+    finally:
+        conn.close()
 
 @app.route('/get_property_details/<int:id>')
 def get_property_details(id):
@@ -535,7 +549,16 @@ def view_listed_property():
         flash("Access denied! Only agents can view this page.", "danger")
         return redirect(url_for('login'))
     #return render_template('view_listed_property.html')
-    return render_template('bidding.html')
+    conn = sqlite3.connect('listings.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # ✅ This grabs ALL listings regardless of status or seller
+    listings = c.execute("SELECT * FROM listings").fetchall()
+    print("[DEBUG] Listings fetched for agent:", [dict(row) for row in listings])
+
+    conn.close()
+    return render_template('bidding.html',listings=listings)
 
 @app.route('/view_bidded_property') #View Properties that you have bidded.
 def view_bidded_property():
