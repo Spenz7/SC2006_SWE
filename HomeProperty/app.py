@@ -18,7 +18,7 @@ def init_db():
     c = conn.cursor()
 
     # Drop the existing users table if needed (optional)
-    c.execute("DROP TABLE IF EXISTS users")
+    #c.execute("DROP TABLE IF EXISTS users")
 
     # phone number isn't unique cuz free trial twilio account only allows 1 phone number
     c.execute('''
@@ -534,7 +534,8 @@ def view_listed_property():
     if 'username' not in session or session.get('user_type') != 'agent':
         flash("Access denied! Only agents can view this page.", "danger")
         return redirect(url_for('login'))
-    return render_template('view_listed_property.html')
+    #return render_template('view_listed_property.html')
+    return render_template('bidding.html')
 
 @app.route('/view_bidded_property') #View Properties that you have bidded.
 def view_bidded_property():

@@ -228,66 +228,6 @@
               </tbody>
               </table>
             </div>
-        
-            <script>
-              function fetchPastPrices() {
-                  const flatType = document.getElementById("flat_type").value;
-                  const town = document.getElementById("town").value;
-                  const floorArea = document.getElementById("floor_area").value;
-                  const leaseYears = document.getElementById("years_remaining").value;
-              
-                  if (!flatType || !town || !floorArea || !leaseYears) {
-                      alert("Please fill in all fields to fetch resale prices.");
-                      return;
-                  }
-              
-                  const apiUrl = `/get_similar_prices?flat_type=${encodeURIComponent(flatType)}&town=${encodeURIComponent(town)}&floor_area=${floorArea}&years_remaining=${leaseYears}`;
-              
-                  fetch(apiUrl)
-                      .then(response => response.json())
-                      .then(data => {
-                          const table = document.getElementById("price-table");
-                          const body = document.getElementById("price-table-body");
-                          const display = document.getElementById("past-price-display");
-              
-                          body.innerHTML = "";  // Clear previous results
-              
-                          if (data.length && !data.error) {
-                              data.forEach(record => {
-                                  const row = document.createElement("tr");
-                                  row.innerHTML = `
-                                      <td>${record.month}</td>
-                                      <td>${record.town}</td>
-                                      <td>${record.flat_type}</td>
-                                      <td>${record.block}</td>
-                                      <td>${record.street_name}</td>
-                                      <td>${record.storey_range}</td>
-                                      <td>${record.flat_model}</td>
-                                      <td>${record.floor_area_sqm}</td>
-                                      <td>${record.remaining_lease}</td>
-                                      <td>$${parseFloat(record.resale_price).toLocaleString()}</td>
-                                  `;
-                                  body.appendChild(row);
-                              });
-              
-                              display.textContent = "Showing up to 5 recent similar resale transactions:";
-                              display.style.color = "green";
-                              table.style.display = "table";
-                          } else {
-                              display.textContent = "No matching resale prices found.";
-                              display.style.color = "red";
-                              table.style.display = "none";
-                          }
-                      })
-                      .catch(err => {
-                          document.getElementById("past-price-display").textContent = "Error fetching data.";
-                          document.getElementById("past-price-display").style.color = "red";
-                          document.getElementById("price-table").style.display = "none";
-                          console.error(err);
-                      });
-              }
-              </script>
-
           <div class="form-group" id="past-prices" style="display:none;">
               <label>Past Prices (Government Data):</label>
               <ul id="past-prices-list"></ul>
@@ -343,6 +283,65 @@
   </footer>
   <!-- / Footer -->
 
+
+  <script>
+    function fetchPastPrices() {
+        const flatType = document.getElementById("flat_type").value;
+        const town = document.getElementById("town").value;
+        const floorArea = document.getElementById("floor_area").value;
+        const leaseYears = document.getElementById("years_remaining").value;
+    
+        if (!flatType || !town || !floorArea || !leaseYears) {
+            alert("Please fill in all fields to fetch resale prices.");
+            return;
+        }
+    
+        const apiUrl = `/get_similar_prices?flat_type=${encodeURIComponent(flatType)}&town=${encodeURIComponent(town)}&floor_area=${floorArea}&years_remaining=${leaseYears}`;
+    
+        fetch(apiUrl)
+            .then(response => response.json())
+            .then(data => {
+                const table = document.getElementById("price-table");
+                const body = document.getElementById("price-table-body");
+                const display = document.getElementById("past-price-display");
+    
+                body.innerHTML = "";  // Clear previous results
+    
+                if (data.length && !data.error) {
+                    data.forEach(record => {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${record.month}</td>
+                            <td>${record.town}</td>
+                            <td>${record.flat_type}</td>
+                            <td>${record.block}</td>
+                            <td>${record.street_name}</td>
+                            <td>${record.storey_range}</td>
+                            <td>${record.flat_model}</td>
+                            <td>${record.floor_area_sqm}</td>
+                            <td>${record.remaining_lease}</td>
+                            <td>$${parseFloat(record.resale_price).toLocaleString()}</td>
+                        `;
+                        body.appendChild(row);
+                    });
+    
+                    display.textContent = "Showing up to 5 recent similar resale transactions:";
+                    display.style.color = "green";
+                    table.style.display = "table";
+                } else {
+                    display.textContent = "No matching resale prices found.";
+                    display.style.color = "red";
+                    table.style.display = "none";
+                }
+            })
+            .catch(err => {
+                document.getElementById("past-price-display").textContent = "Error fetching data.";
+                document.getElementById("past-price-display").style.color = "red";
+                document.getElementById("price-table").style.display = "none";
+                console.error(err);
+            });
+    }
+    </script>
   
    <!-- Validation Script -->
    <script>

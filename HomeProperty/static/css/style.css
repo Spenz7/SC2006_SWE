@@ -3582,5 +3582,11 @@ img {
     background-color: #f9f9f9; /* zebra stripes */
   }
   
+
+  .property-card h4,
+  .property-card p {
+    color: black;
+  }
+
  
 }
