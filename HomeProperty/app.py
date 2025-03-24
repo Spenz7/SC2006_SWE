@@ -473,7 +473,7 @@ def list_property():
             years_remaining = int(years_remaining)
             listing_price = float(listing_price)
 
-            if floor_area < 1 or max_com_bid < 0 or max_com_bid > 3 or years_remaining < 1 or listing_price < 0:
+            if floor_area < 1 or max_com_bid < 0 or max_com_bid > 5 or years_remaining < 1 or listing_price < 0:
                 flash("Invalid input values!", "danger")
                 return redirect(url_for('list_property'))
         except ValueError:
