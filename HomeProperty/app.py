@@ -47,7 +47,7 @@ def init_listings_db():
             town TEXT NOT NULL,
             street_name TEXT NOT NULL,
             floor_area INTEGER NOT NULL,
-            min_bid_interval REAL NOT NULL,
+            max_com_bid REAL NOT NULL,
             years_remaining INTEGER NOT NULL,
             listing_price REAL NOT NULL
         )
@@ -462,18 +462,18 @@ def list_property():
         town = request.form.get('town')
         street_name = request.form.get('street_name')
         floor_area = request.form.get('floor_area')
-        min_bid_interval = request.form.get('min_bid_interval')
+        max_com_bid = request.form.get('max_com_bid')
         years_remaining = request.form.get('years_remaining')
         listing_price = request.form.get('listing_price')
 
         # Input validation
         try:
             floor_area = int(floor_area)
-            min_bid_interval = float(min_bid_interval)
+            max_com_bid = float(max_com_bid)
             years_remaining = int(years_remaining)
             listing_price = float(listing_price)
 
-            if floor_area < 1 or min_bid_interval < 0 or min_bid_interval > 3 or years_remaining < 1 or listing_price < 0:
+            if floor_area < 1 or max_com_bid < 0 or max_com_bid > 3 or years_remaining < 1 or listing_price < 0:
                 flash("Invalid input values!", "danger")
                 return redirect(url_for('list_property'))
         except ValueError:
@@ -499,14 +499,14 @@ def list_property():
                         town TEXT NOT NULL,
                         street_name TEXT NOT NULL,
                         floor_area INTEGER NOT NULL,
-                        min_bid_interval REAL NOT NULL,
+                        max_com_bid REAL NOT NULL,
                         years_remaining INTEGER NOT NULL,
                         listing_price REAL NOT NULL
                     )''')"""
     
         # Insert the property listing
-        c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, min_bid_interval, years_remaining, listing_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                  (session['username'], flat_type, town, street_name, floor_area, min_bid_interval, years_remaining, listing_price))
+        c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                  (session['username'], flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price))
 
         conn.commit()
         conn.close()

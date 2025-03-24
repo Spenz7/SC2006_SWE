@@ -239,10 +239,10 @@
               <img src="{{ url_for('static', filename='img/item1.jpg') }}" alt="Property Image">
               <h4>{{ property['flat_type'] }} in {{ property['town'] }}</h4>
               <p>{{ property['floor_area'] }} SQ FT | ${{ property['listing_price'] }}</p>
-              <p>Max Commission: {{ property['min_bid_interval'] }}%</p>
+              <p>Max Commission: {{ property['max_com_bid'] }}%</p>
               <button class="bid-button"
                       data-title="{{ property['flat_type'] }} in {{ property['town'] }}"
-                      data-max="{{ property['min_bid_interval'] }}"
+                      data-max="{{ property['max_com_bid'] }}"
                       onclick="handleBidClick(this)">
                 <strong>Bid</strong>
               </button>

@@ -368,7 +368,7 @@ jQuery(function($){
               $('#modal-town').text(data.property.town);
               $('#modal-street-name').text(data.property.street_name);
               $('#modal-floor-area').text(data.property.floor_area);
-              $('#modal-min-bid-interval').text(data.property.min_bid_interval);
+              $('#modal-min-bid-interval').text(data.property.max_com_bid);
               $('#modal-years-remaining').text(data.property.years_remaining);
               $('#modal-listing-price').text(data.property.listing_price);
   
