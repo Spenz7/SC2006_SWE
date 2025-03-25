@@ -6,6 +6,7 @@ import requests
 from twilio.rest import Client #need for SMS OTP
 import random
 import time
+import csv
 
 app = Flask(__name__)
 
@@ -39,8 +40,11 @@ def init_db():
 def init_listings_db():
     conn = sqlite3.connect('listings.db')
     c = conn.cursor()
+
+    c.execute('DROP TABLE IF EXISTS listings')
+    # ✅ Now create fresh table with the correct columns
     c.execute('''
-        CREATE TABLE IF NOT EXISTS listings (
+        CREATE TABLE listings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             seller_username TEXT NOT NULL,
             flat_type TEXT NOT NULL,
@@ -49,14 +53,16 @@ def init_listings_db():
             floor_area INTEGER NOT NULL,
             max_com_bid REAL NOT NULL,
             years_remaining INTEGER NOT NULL,
-            listing_price REAL NOT NULL
+            listing_price REAL NOT NULL,
+            bidders TEXT DEFAULT '[]',   -- 2D array of agent bids as JSON
+            status TEXT DEFAULT 'A'      -- A = active, B = closed, C = sold
         )
     ''')
     conn.commit()
     conn.close()
 
 init_db() #re-run this whenever u wan del existing db
-init_listings_db()
+#init_listings_db()
 
 import sqlite3
 import requests
@@ -76,65 +82,63 @@ def parse_remaining_lease(lease_str):
     except:
         return 0
 
-def find_similar_past_prices(flat_type, town, floor_area, remaining_lease):
-    dataset_id = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
-    base_url = "https://data.gov.sg/api/action/datastore_search"
+def load_resale_data():
+    records = []
+    with open('resale_data.csv', newline='') as csvfile:
+        reader = csv.DictReader(csvfile)
+        for row in reader:
+            row['floor_area_sqm'] = float(row.get('floor_area_sqm', 0))
+            row['resale_price'] = float(row.get('resale_price', 0))
+            row['remaining_lease'] = parse_remaining_lease(row.get('remaining_lease', ''))
+            records.append(row)
+    return sorted(records, key=lambda x: x.get('month', ''), reverse=True)
 
-    min_area = int(floor_area) - 10
-    max_area = int(floor_area) + 10
-    min_lease = int(remaining_lease) - 5
-    max_lease = int(remaining_lease) + 5
+def filter_records(records, flat_type, town, min_area=None, max_area=None, min_lease=None, max_lease=None):
+    result = []
+    for r in records:
+        if r.get("flat_type") != flat_type or r.get("town") != town:
+            continue
 
-    filtered = []
+        area = r["floor_area_sqm"]
+        lease = r["remaining_lease"]
 
-    for offset in range(0, 250000, 1000):
-        page_number = (offset // 1000) + 1
-        print(f"📦 Fetching records... Page {page_number}, Offset {offset}")
-        params = {
-            "resource_id": dataset_id,
-            "limit": 1000,
-            "offset": offset
-        }
+        if min_area is not None and (area < min_area or area > max_area):
+            continue
+        if min_lease is not None and (lease < min_lease or lease > max_lease):
+            continue
 
-        try:
-            response = requests.get(base_url, params=params)
-            data = response.json()
-
-            if "result" not in data or "records" not in data["result"]:
-                break
-
-            records = data["result"]["records"]
-
-            for r in records:
-                try:
-                    area = float(r.get("floor_area_sqm", 0))
-                    lease = parse_remaining_lease(r.get("remaining_lease", "0"))
-                    resale_price = r.get("resale_price")
-
-                    if (
-                        r.get("flat_type") == flat_type and
-                        r.get("town") == town and
-                        resale_price and
-                        min_area <= area <= max_area and
-                        min_lease <= lease <= max_lease
-                    ):
-                        filtered.append(r)
-                        if len(filtered) >= 5:
-                            break  # Stop inner loop
-                except Exception as e:
-                    print("⚠️ Skipped record due to error:", e)
-                    continue
-
-            if len(filtered) >= 5:
-                break  # Stop outer loop
-
-            time.sleep(0.1)
-        except Exception as e:
-            print(f"❌ Error fetching or parsing data: {e}")
+        result.append(r)
+        if len(result) == 5:
             break
+    return result
 
-    # Sort by most recent month (in case 5 were not the latest)
-    filtered.sort(key=lambda x: x.get("month", ""), reverse=True)
+def find_similar_past_prices(flat_type, town, floor_area, remaining_lease):
+    records = load_resale_data()
+
+    # Try strict match first
+    results = filter_records(
+        records,
+        flat_type,
+        town,
+        min_area=int(floor_area) - 10,
+        max_area=int(floor_area) + 10,
+        min_lease=int(remaining_lease) - 5,
+        max_lease=int(remaining_lease) + 5
+    )
+
+    # Fallback #1: match area only, loosened range
+    if not results:
+        results = filter_records(
+            records,
+            flat_type,
+            town,
+            min_area=int(floor_area) - 15,
+            max_area=int(floor_area) + 15
+        )
+
+    # Fallback #2: match flat_type + town only
+    if not results:
+        results = filter_records(records, flat_type, town)
 
     return [{
         "month": r.get("month"),
@@ -147,9 +151,7 @@ def find_similar_past_prices(flat_type, town, floor_area, remaining_lease):
         "flat_model": r.get("flat_model"),
         "remaining_lease": r.get("remaining_lease"),
         "resale_price": r.get("resale_price")
-    } for r in filtered[:5]]
-# Run these functions when initializing the app
-
+    } for r in results]
 #go to http://localhost:5000/view_accounts to view
 @app.route('/view_accounts')
 def view_accounts():
@@ -413,36 +415,66 @@ def view_your_property():
     finally:
         conn.close()
 
+import json
+
 @app.route('/get_property_details/<int:id>')
 def get_property_details(id):
     if 'username' not in session or session.get('user_type') != 'seller':
         return jsonify({'error': 'Unauthorized access'}), 403
-    
+
     conn = sqlite3.connect('listings.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
-    
-    # Get property details
+
     property = c.execute("SELECT * FROM listings WHERE id = ?", (id,)).fetchone()
-    
     if not property:
+        conn.close()
         return jsonify({'error': 'Property not found'}), 404
-    
+
+    property_data = dict(property)
+
+    try:
+        # Parse bidders from JSON
+        bidders = json.loads(property_data.get('bidders', '[]'))
+    except Exception as e:
+        print("❌ Error parsing bidders JSON:", e)
+        bidders = []
+
     conn.close()
 
-    # ✅ Hardcoded bidder data for testing
-    bidder_data = [
-        {'bidder_username': 'PropAgent1', 'bid_amount': 1.5, 'review': '4.5/5'},
-        {'bidder_username': 'PropAgent2', 'bid_amount': 1.8, 'review': '5/5'}
-        ]
-    
-    property_data = dict(property)
-    
     return jsonify({
         'property': property_data,
-        'bidders': bidder_data
+        'bidders': bidders
     })
 
+@app.route('/accept_bid', methods=['POST'])
+def accept_bid():
+    if 'username' not in session or session.get('user_type') != 'seller':
+        return jsonify({'error': 'Unauthorized'}), 403
+
+    data = request.get_json()
+    property_id = data.get('property_id')
+    accepted_agent = data.get('agent_username')
+
+    if not property_id or not accepted_agent:
+        return jsonify({'error': 'Missing data'}), 400
+
+    conn = sqlite3.connect('listings.db')
+    c = conn.cursor()
+
+    # Fetch the listing
+    c.execute("SELECT * FROM listings WHERE id = ?", (property_id,))
+    row = c.fetchone()
+    if not row:
+        conn.close()
+        return jsonify({'error': 'Property not found'}), 404
+
+    # Set listing status to 'C' (sold)
+    c.execute("UPDATE listings SET status = 'C' WHERE id = ?", (property_id,))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True, 'message': f"Bid by {accepted_agent} accepted. Listing marked as sold."})
 
 
 @app.route('/list-property', methods=['GET', 'POST'])
@@ -505,8 +537,8 @@ def list_property():
                     )''')"""
     
         # Insert the property listing
-        c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                  (session['username'], flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price))
+        c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price, bidders, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+          (session['username'], flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price, '[]', 'A'))
 
         conn.commit()
         conn.close()
@@ -529,9 +561,12 @@ def get_similar_prices():
         return jsonify({"error": "Missing parameters"}), 400
 
     try:
+        print("🔍 Params received:", flat_type, town, floor_area, years_remaining)
         results = find_similar_past_prices(flat_type, town, int(floor_area), int(years_remaining))
+        print("✅ Matching results:", results)
         return jsonify(results)
     except Exception as e:
+        print("❌ Error in get_similar_prices:", e)
         return jsonify({"error": str(e)}), 500
 
 # For Agent Dashbaords.
@@ -593,5 +628,5 @@ def index():
 
 if __name__ == '__main__':
     init_db()
-    init_listings_db()
+    #init_listings_db()
     app.run(debug=True)

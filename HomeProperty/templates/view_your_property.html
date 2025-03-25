@@ -191,7 +191,8 @@
                                         <span class="aa-price">
                                             ${{ property['listing_price'] }}
                                         </span>
-                                        <a class="aa-secondary-btn" href="#" onclick="loadPropertyDetails({{ property['id'] }})">More Details</a>                                    </div>
+                                        <a class="aa-secondary-btn" href="#" onclick="loadPropertyDetails('{{ property.id }}')">More Details</a>
+                                                                         
                                 </div>
                             </article>
                         </li>
@@ -267,7 +268,7 @@
   </footer>
   <!-- / Footer -->
 
-  <!-- Modal -->
+<!-- Modal -->
 <div class="modal fade" id="propertyModal" tabindex="-1" role="dialog" aria-labelledby="propertyModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content" style="color: black;">
@@ -277,7 +278,6 @@
           <span aria-hidden="true">&times;</span>
         </button>
       </div>
-      
       <div class="modal-body">
         <div id="property-details">
           <p><strong>Flat Type:</strong> <span id="modal-flat-type"></span></p>
@@ -288,7 +288,7 @@
           <p><strong>Years Remaining:</strong> <span id="modal-years-remaining"></span></p>
           <p><strong>Listing Price:</strong> $<span id="modal-listing-price"></span></p>
         </div>
-        
+
         <hr>
         <h5>Current Bidders</h5>
         <table class="table table-striped">
@@ -296,17 +296,84 @@
             <tr>
               <th>Bidder</th>
               <th>Bid Amount</th>
-              <th>Time</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="bidder-list">
-            <!-- Bidder info will be dynamically added here -->
+            <!-- Filled by JavaScript -->
           </tbody>
         </table>
       </div>
     </div>
   </div>
 </div>
+
+<script>
+function loadPropertyDetails(propertyId) {
+  fetch(`/get_property_details/${propertyId}`)
+    .then(response => response.json())
+    .then(data => {
+      const property = data.property;
+      const bidders = data.bidders;
+
+      document.getElementById("modal-flat-type").innerText = property.flat_type;
+      document.getElementById("modal-town").innerText = property.town;
+      document.getElementById("modal-street-name").innerText = property.street_name;
+      document.getElementById("modal-floor-area").innerText = property.floor_area;
+      document.getElementById("modal-max-com-bid").innerText = property.max_com_bid;
+      document.getElementById("modal-years-remaining").innerText = property.years_remaining;
+      document.getElementById("modal-listing-price").innerText = property.listing_price;
+
+      const tbody = document.getElementById("bidder-list");
+      tbody.innerHTML = "";
+
+      bidders.forEach(bid => {
+        const row = document.createElement("tr");
+
+        const name = document.createElement("td");
+        name.innerText = bid.agent_username || "N/A";
+
+        const amount = document.createElement("td");
+        amount.innerText = bid.bid_percent + "%";
+
+        const action = document.createElement("td");
+        const btn = document.createElement("button");
+        btn.innerText = "Accept";
+        btn.className = "btn btn-success btn-sm";
+        btn.onclick = () => acceptBid(propertyId, bid.agent_username);
+
+        action.appendChild(btn);
+        row.appendChild(name);
+        row.appendChild(amount);
+        row.appendChild(action);
+        tbody.appendChild(row);
+      });
+
+      $('#propertyModal').modal('show');
+    })
+    .catch(error => console.error("Error fetching property:", error));
+}
+
+function acceptBid(propertyId, agentUsername) {
+  fetch('/accept_bid', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      property_id: propertyId,
+      agent_username: agentUsername
+    })
+  })
+  .then(res => res.json())
+  .then(response => {
+    alert(response.message);
+    location.reload();
+  })
+  .catch(err => console.error("Error accepting bid:", err));
+}
+</script>
+
 
 
 
