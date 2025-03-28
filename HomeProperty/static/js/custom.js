@@ -186,70 +186,56 @@ jQuery(function($){
     jQuery(function(){
       if(jQuery('body').is('.aa-price-range')){
         // FOR AREA SECTION
-       var skipSlider = document.getElementById('aa-sqrfeet-range');
+       // FOR AREA SECTION
+      var skipSlider = document.getElementById('aa-sqrfeet-range');
+      if (skipSlider) {
         noUiSlider.create(skipSlider, {
-            range: {
-              'min': 0,
-                //'10%': 100,
-                //'20%': 200,
-                //'30%': 300,
-                //'40%': 400,
-                //'50%': 500,
-                //'60%': 600,
-                //'70%': 700,
-                //'80%': 800,
-                //'90%': 900,
-                'max': 1000
-            },
-            snap: false,
-            step: 10,
-            connect: true,
-            start: [0, 1000]
+          range: {
+            'min': 0,
+            'max': 1000
+          },
+          snap: false,
+          step: 10,
+          connect: true,
+          start: [0, 1000]
         });
-        // for value print
+
         var skipValues = [
           document.getElementById('skip-value-lower'),
           document.getElementById('skip-value-upper')
         ];
 
-        skipSlider.noUiSlider.on('update', function( values, handle ) {
-         skipValues[handle].innerHTML = values[handle];
+        skipSlider.noUiSlider.on('update', function (values, handle) {
+          if (skipValues[handle]) {
+            skipValues[handle].innerHTML = values[handle];
+          }
         });
+      }
 
-        // FOR PRICE SECTION
-
-        var skipSlider2 = document.getElementById('aa-price-range');
+      // FOR PRICE SECTION
+      var skipSlider2 = document.getElementById('aa-price-range');
+      if (skipSlider2) {
         noUiSlider.create(skipSlider2, {
-            range: {
-              'min': 0,
-             // '5%' : 80000,
-              //'10%': 160000,
-              //'20%': 320000,
-              //'30%': 480000,
-              //'40%': 640000,
-              //'50%': 800000,
-             // '60%': 960000,
-              //'70%': 1120000,
-              //'80%': 1280000,
-              //'90%': 1440000,
-              'max': 5000000
-            },
-           // snap: true,
-            step: 10000,
-            connect: true,
-            start: [0, 6000000]
+          range: {
+            'min': 0,
+            'max': 5000000
+          },
+          step: 10000,
+          connect: true,
+          start: [0, 6000000]
         });
-        // for value print
+
         var skipValues2 = [
           document.getElementById('skip-value-lower2'),
           document.getElementById('skip-value-upper2')
         ];
 
-        skipSlider2.noUiSlider.on('update', function( values, handle ) {
-          skipValues2[handle].innerHTML = values[handle];
+        skipSlider2.noUiSlider.on('update', function (values, handle) {
+          if (skipValues2[handle]) {
+            skipValues2[handle].innerHTML = values[handle];
+          }
         });
-      }
-    });
+}
 
   /* ----------------------------------------------------------- */
   /*  9. MIXIT FILTER ( FOR GALLERY ) 
@@ -403,7 +389,7 @@ jQuery(function($){
   }
   window.loadPropertyDetails = loadPropertyDetails;
 
-
+}
+});
  
 });
-

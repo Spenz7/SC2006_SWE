@@ -21,7 +21,7 @@ def init_db():
 
     # Drop the existing users table if needed (optional)
     #c.execute("DROP TABLE IF EXISTS users")
-
+    c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='listings'")
     # phone number isn't unique cuz free trial twilio account only allows 1 phone number
     c.execute('''
         CREATE TABLE IF NOT EXISTS users (
@@ -42,7 +42,7 @@ def init_listings_db():
     conn = sqlite3.connect('listings.db')
     c = conn.cursor()
 
-    c.execute('DROP TABLE IF EXISTS listings')
+    
     # ✅ Now create fresh table with the correct columns
     c.execute('''
         CREATE TABLE listings (
@@ -63,7 +63,6 @@ def init_listings_db():
     conn.close()
 
 init_db() #re-run this whenever u wan del existing db
-init_listings_db()
 
 def parse_remaining_lease(lease_str):
     try:
@@ -498,18 +497,82 @@ def get_property_details(id):
     property_data = dict(property)
 
     try:
-        # Parse bidders from JSON
-        bidders = json.loads(property_data.get('bidders', '[]'))
+        # ✅ Parse and convert bidders into dictionaries
+        raw_bidders = json.loads(property_data.get('bidders', '[]'))
+        bidders = [{"agent_username": b[0], "bid_percent": b[1]} for b in raw_bidders]
     except Exception as e:
         print("❌ Error parsing bidders JSON:", e)
         bidders = []
 
     conn.close()
+    print("📦 Returning property details:", property_data)
+    print("👥 Returning bidders:", bidders)
+    
+    response = {
+    'property': property_data,
+    'bidders': bidders
+    }   
+    print("🔄 FINAL RESPONSE TO FRONTEND:", response)
+    return jsonify(response)
+    
+@app.route('/submit_bid', methods=['POST'])
+def submit_bid():
+    if 'username' not in session or session.get('user_type') != 'agent':
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
 
-    return jsonify({
-        'property': property_data,
-        'bidders': bidders
-    })
+    data = request.get_json()
+    property_id = data.get('property_id')
+    commission = data.get('commission')
+
+    if not property_id or commission is None:
+        return jsonify({'success': False, 'message': 'Missing property ID or commission value'}), 400
+
+    try:
+        commission = round(float(commission), 2)
+    except ValueError:
+        return jsonify({'success': False, 'message': 'Invalid commission value'}), 400
+
+    conn = sqlite3.connect('listings.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    # Fetch listing
+    listing = c.execute("SELECT * FROM listings WHERE id = ?", (property_id,)).fetchone()
+    if not listing:
+        conn.close()
+        return jsonify({'success': False, 'message': 'Listing not found'}), 404
+
+    if listing['status'] != 'A':
+        conn.close()
+        return jsonify({'success': False, 'message': 'Bidding is closed for this listing'}), 400
+
+    max_com = listing['max_com_bid']
+    if commission > max_com:
+        conn.close()
+        return jsonify({'success': False, 'message': f'Commission exceeds maximum allowed ({max_com}%)'}), 400
+
+    import json
+    try:
+        bidders = json.loads(listing['bidders']) if listing['bidders'] else []
+    except Exception as e:
+        print("❌ Failed to parse bidders JSON:", e)
+        bidders = []
+
+    agent_username = session['username']
+    # Check if this agent has already bid — update if yes, else append
+    for bid in bidders:
+        if bid[0] == agent_username:
+            bid[1] = commission  # update existing bid
+            break
+    else:
+        bidders.append([agent_username, commission])  # new bid
+
+    # Save updated bidders back to DB
+    c.execute("UPDATE listings SET bidders = ? WHERE id = ?", (json.dumps(bidders), property_id))
+    conn.commit()
+    conn.close()
+
+    return jsonify({'success': True, 'message': 'Bid submitted successfully!'})
 
 @app.route('/accept_bid', methods=['POST'])
 def accept_bid():
@@ -692,5 +755,4 @@ def index():
 
 if __name__ == '__main__':
     init_db()
-    #init_listings_db()
     app.run(debug=True)

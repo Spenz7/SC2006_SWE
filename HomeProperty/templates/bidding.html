@@ -241,10 +241,11 @@
               <p>{{ property['floor_area'] }} SQ FT | ${{ property['listing_price'] }}</p>
               <p>Max Commission: {{ property['max_com_bid'] }}%</p>
               <button class="bid-button"
-                      data-title="{{ property['flat_type'] }} in {{ property['town'] }}"
-                      data-max="{{ property['max_com_bid'] }}"
-                      onclick="handleBidClick(this)">
-                <strong>Bid</strong>
+              data-title="{{ property['flat_type'] }} in {{ property['town'] }}"
+              data-max="{{ property['max_com_bid'] }}"
+              data-property-id="{{ property['id'] }}"
+              onclick="handleBidClick(this)">
+              <strong>Bid</strong>
               </button>
             </div>
           {% endfor %}
@@ -297,37 +298,57 @@
     <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
     <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
     <script>
+      let currentPropertyId = null;
+      let maxCommission = 0;
+    
       function handleBidClick(btn) {
-          const title = btn.dataset.title;
-          const max = parseFloat(btn.dataset.max);
-          openBidModal(title, max);
+        const title = btn.dataset.title;
+        const max = parseFloat(btn.dataset.max);
+        const id = btn.dataset.propertyId;
+    
+        currentPropertyId = id;
+        maxCommission = max;
+    
+        document.getElementById('property-name').innerText = `Bidding for: ${title}`;
+        document.getElementById('final-commission').value = '';
+        document.getElementById('final-commission').max = max;
+        document.getElementById('bidModal').style.display = 'block';
+      }
+    
+      function closeBidModal() {
+        document.getElementById('bidModal').style.display = 'none';
+      }
+    
+      async function placeBid() {
+        const commission = parseFloat(document.getElementById('final-commission').value);
+        if (isNaN(commission) || commission <= 0 || commission > maxCommission) {
+          alert(`Please enter a valid commission percentage (max: ${maxCommission}%)`);
+          return;
         }
-
-        let currentProperty = '';
-        let maxCommission = 0;
-  
-        function openBidModal(propertyName, maxCom) {
-          currentProperty = propertyName;
-          maxCommission = maxCom;
-          document.getElementById('property-name').innerText = `Bidding for: ${propertyName}`;
-          document.getElementById('final-commission').value = '';
-          document.getElementById('final-commission').max = maxCom;
-          document.getElementById('bidModal').style.display = 'block';
-        }
-  
-        function closeBidModal() {
-          document.getElementById('bidModal').style.display = 'none';
-        }
-  
-        function placeBid() {
-          const commission = parseFloat(document.getElementById('final-commission').value);
-          if (isNaN(commission) || commission <= 0 || commission > maxCommission) {
-            alert(`Please enter a valid commission percentage (max: ${maxCommission}%)`);
-            return;
+    
+        try {
+          const response = await fetch('/submit_bid', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              property_id: currentPropertyId,
+              commission: commission
+            })
+          });
+    
+          const result = await response.json();
+          if (result.success) {
+            alert(result.message);
+            closeBidModal();
+            location.reload(); // Reload to reflect bid
+          } else {
+            alert(result.message || "Something went wrong.");
           }
-          alert(`Your bid for ${currentProperty} with ${commission}% commission has been submitted.`);
-          closeBidModal();
+        } catch (error) {
+          console.error("Error submitting bid:", error);
+          alert("Failed to submit bid.");
         }
+      }
     </script>
   </body>
 

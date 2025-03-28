@@ -307,77 +307,6 @@
     </div>
   </div>
 </div>
-
-<script>
-function loadPropertyDetails(propertyId) {
-  fetch(`/get_property_details/${propertyId}`)
-    .then(response => response.json())
-    .then(data => {
-      const property = data.property;
-      const bidders = data.bidders;
-
-      document.getElementById("modal-flat-type").innerText = property.flat_type;
-      document.getElementById("modal-town").innerText = property.town;
-      document.getElementById("modal-street-name").innerText = property.street_name;
-      document.getElementById("modal-floor-area").innerText = property.floor_area;
-      document.getElementById("modal-max-com-bid").innerText = property.max_com_bid;
-      document.getElementById("modal-years-remaining").innerText = property.years_remaining;
-      document.getElementById("modal-listing-price").innerText = property.listing_price;
-
-      const tbody = document.getElementById("bidder-list");
-      tbody.innerHTML = "";
-
-      bidders.forEach(bid => {
-        const row = document.createElement("tr");
-
-        const name = document.createElement("td");
-        name.innerText = bid.agent_username || "N/A";
-
-        const amount = document.createElement("td");
-        amount.innerText = bid.bid_percent + "%";
-
-        const action = document.createElement("td");
-        const btn = document.createElement("button");
-        btn.innerText = "Accept";
-        btn.className = "btn btn-success btn-sm";
-        btn.onclick = () => acceptBid(propertyId, bid.agent_username);
-
-        action.appendChild(btn);
-        row.appendChild(name);
-        row.appendChild(amount);
-        row.appendChild(action);
-        tbody.appendChild(row);
-      });
-
-      $('#propertyModal').modal('show');
-    })
-    .catch(error => console.error("Error fetching property:", error));
-}
-
-function acceptBid(propertyId, agentUsername) {
-  fetch('/accept_bid', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      property_id: propertyId,
-      agent_username: agentUsername
-    })
-  })
-  .then(res => res.json())
-  .then(response => {
-    alert(response.message);
-    location.reload();
-  })
-  .catch(err => console.error("Error accepting bid:", err));
-}
-</script>
-
-
-
-
-
   <!-- jQuery library -->
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
@@ -386,6 +315,77 @@ function acceptBid(propertyId, agentUsername) {
   <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+  <script>
+    function loadPropertyDetails(propertyId) {
+  fetch(`/get_property_details/${propertyId}`)
+    .then(response => response.json())
+    .then(data => {
+      const property = data.property;
+      const bidders = data.bidders;
+
+      console.log("📦 Property fetched:", property);
+      console.log("👥 Bidders received:", bidders);
+
+      // Fill in property details
+      $('#modal-flat-type').text(property.flat_type);
+      $('#modal-town').text(property.town);
+      $('#modal-street-name').text(property.street_name);
+      $('#modal-floor-area').text(property.floor_area);
+      $('#modal-max-com-bid').text(property.max_com_bid);
+      $('#modal-years-remaining').text(property.years_remaining);
+      $('#modal-listing-price').text(property.listing_price);
+
+      // Clear previous bidders
+      $('#bidder-list').empty();
+
+      if (bidders.length > 0) {
+        bidders.forEach(bid => {
+          // Fallback-safe extraction
+          const username = bid.agent_username || bid[0];
+          const percent = bid.bid_percent || bid[1];
+
+          $('#bidder-list').append(`
+            <tr>
+              <td>${username}</td>
+              <td>${percent}%</td>
+              <td>
+                <button class="btn btn-success btn-sm" onclick="acceptBid(${property.id}, '${username}')">Accept</button>
+              </td>
+            </tr>
+          `);
+        });
+      } else {
+        $('#bidder-list').append(`
+          <tr>
+            <td colspan="3" class="text-center">No bids yet</td>
+          </tr>
+        `);
+      }
+
+      // Show the modal
+      $('#propertyModal').modal('show');
+    })
+    .catch(error => console.error("❌ Error fetching property details:", error));
+}
+  
+    function acceptBid(propertyId, agentUsername) {
+      fetch('/accept_bid', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          property_id: propertyId,
+          agent_username: agentUsername
+        })
+      })
+      .then(res => res.json())
+      .then(response => {
+        alert(response.message);
+        location.reload(); // Refresh to reflect changes
+      })
+      .catch(err => console.error("❌ Error accepting bid:", err));
+    }
+  </script>
+    
 
   </body>
 </html>
