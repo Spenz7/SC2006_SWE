@@ -48,6 +48,13 @@
                 <div class="aa-single-field">
                     <label for="password">Password <span class="required">*</span></label>
                     <input type="password" name="password" required id="password">
+                    <small class="form-text text-muted">Password Requirements:</small>
+                    <ul class="password-requirements">
+                        <li>At least 8 characters long</li>
+                        <li>Contains both uppercase and lowercase letters</li>
+                        <li>Contains at least one numeric digit</li>
+                        <li>Contains at least one special character (e.g. !@#$%^&*)</li>
+                    </ul>
                 </div>
                 <div class="aa-single-field">
                     <label for="confirm-password">Confirm Password <span class="required">*</span></label>
@@ -138,9 +145,6 @@
           alert("Please enter a valid 8-digit phone number.");
       }
     });
-
-
-
   </script>
 
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
