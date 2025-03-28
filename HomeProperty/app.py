@@ -7,6 +7,7 @@ from twilio.rest import Client #need for SMS OTP
 import random
 import time
 import csv
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 
@@ -62,7 +63,7 @@ def init_listings_db():
     conn.close()
 
 init_db() #re-run this whenever u wan del existing db
-#init_listings_db()
+init_listings_db()
 
 def parse_remaining_lease(lease_str):
     try:
@@ -339,13 +340,65 @@ def create_account():
         phone_number = request.args.get('phone_number')
         return render_template('create_account.html', show_otp=True, phone_number=phone_number)
 
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        phone_number = request.form['phone_number'].strip()
+
+        # Ensure phone number starts with +65
+        if not phone_number.startswith('+65'):
+            phone_number = '+65' + phone_number
+
+        otp = request.form.get('otp')  # OTP entered by the user
+        new_password = request.form['new_password'].strip()
+        confirm_new_password = request.form['confirm_new_password'].strip()
+
+        # Check if the OTP is correct
+        if 'otp' not in session or session['otp'] != int(otp):
+            flash("Invalid OTP. Please try again.", "error")
+            return redirect(url_for('change_password'))
+
+        # Check if the new password and confirm password match
+        if new_password != confirm_new_password:
+            flash("Passwords do not match. Please try again.", "error")
+            return redirect(url_for('change_password'))
+
+        # Validate password strength
+        if not is_strong_password(new_password):
+            flash("Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a digit, and a special character.", "error")
+            return redirect(url_for('change_password'))
+
+        # Validate phone number (check if it matches the user in DB)
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username=? AND phone_number=?", (username, phone_number))
+        user = c.fetchone()
+        conn.close()
+
+        if not user:
+            flash("User not found or phone number mismatch.", "error")
+            return redirect(url_for('change_password'))
+
+        # Store the raw password in the database (no hashing)
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+        c.execute("UPDATE users SET password=? WHERE username=?", (new_password, username))
+        conn.commit()
+        conn.close()
+
+        flash("Password changed successfully!", "success")
+        return redirect(url_for('login'))
+
+    return render_template('change_password.html')
+    
 # Login route
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-        user_type = request.form['user-type']  # Get the user type from the form
+        user_type = request.form['user_type']  # Get the user type from the form
 
         # Check if the user exists in the database with the selected user_type
         conn = sqlite3.connect('accounts.db')
