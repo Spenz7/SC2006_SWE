@@ -230,6 +230,20 @@ def send_otp():
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 400
 
+def is_strong_password(password):
+    """Check if the password meets strength requirements."""
+    if len(password) < 8:
+        return False
+    if not re.search(r'[A-Z]', password):  # Check for uppercase letter
+        return False
+    if not re.search(r'[a-z]', password):  # Check for lowercase letter
+        return False
+    if not re.search(r'[0-9]', password):  # Check for a digit
+        return False
+    if not re.search(r'[\W_]', password):  # Check for special character
+        return False
+    return True
+
 
 @app.route('/create_account', methods=['GET', 'POST'])
 def create_account():
@@ -246,6 +260,11 @@ def create_account():
             error_message = "Passwords do not match."
             return render_template('create_account.html', error_message=error_message)
         
+        # Validate password strength
+        if not is_strong_password(password):
+            error_message = "Password must be at least 8 characters long, contain both upper and lower case letters, a number, and a special character."
+            return render_template('create_account.html', error_message=error_message)
+
         # Prepend +65 if not present
         if not phone_number.startswith('+65'):
             phone_number = '+65' + phone_number
@@ -262,7 +281,6 @@ def create_account():
                 return render_template('create_account.html', error_message=error_message)
             
             del session['otp']  # Clear OTP from session after successful verification
-
 
         # Initialize database connection
         conn = sqlite3.connect('accounts.db')
