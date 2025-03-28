@@ -64,13 +64,6 @@ def init_listings_db():
 init_db() #re-run this whenever u wan del existing db
 #init_listings_db()
 
-import sqlite3
-import requests
-import time
-
-import requests
-import time
-
 def parse_remaining_lease(lease_str):
     try:
         if not lease_str:
