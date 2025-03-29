@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Agent Profile</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+    <style>
+        body {
+            background-color: #111;
+            color: white;
+            padding-top: 30px;
+        }
+        .container {
+            max-width: 800px;
+            background: #222;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        .list-group-item {
+            background-color: #fff;
+            color: #000;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2 class="mb-4">Agent Profile</h2>
+        <p><strong>Full Name:</strong> {{ agent['full_name'] }}</p>
+        <p><strong>Username:</strong> {{ agent['username'] }}</p>
+        <p><strong>Agent ID:</strong> {{ agent['agent_id'] }}</p>
+        
+        <h4 class="mt-4">Reviews:</h4>
+        {% if reviews %}
+            <ul class="list-group">
+                {% for review in reviews %}
+                    <li class="list-group-item">
+                        <strong>Rating:</strong> {{ review['review_rating'] }}<br>
+                        <strong>Review:</strong> {{ review['review_text'] }}<br>
+                        <small><strong>From Seller:</strong> {{ review['seller_username'] }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No reviews yet.</p>
+        {% endif %}
+    </div>
+</body>
+</html>

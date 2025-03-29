@@ -339,6 +339,44 @@ def create_account():
         phone_number = request.args.get('phone_number')
         return render_template('create_account.html', show_otp=True, phone_number=phone_number)
 
+@app.route('/mark_as_sold', methods=['POST'])
+def mark_as_sold():
+    if 'username' not in session or session.get('user_type') != 'seller':
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
+
+    data = request.get_json()
+    property_id = data.get('property_id')
+    agent_username = data.get('agent_username')
+    rating = data.get('rating')
+    review = data.get('review')
+
+    if not all([property_id, agent_username, rating]):
+        return jsonify({'success': False, 'message': 'Missing required fields'}), 400
+
+    try:
+        # Update property status in listings.db
+        conn1 = sqlite3.connect('listings.db')
+        c1 = conn1.cursor()
+        c1.execute("UPDATE listings SET status = 'C' WHERE id = ?", (property_id,))
+        conn1.commit()
+        conn1.close()
+
+        # Insert review into accounts.db
+        conn2 = sqlite3.connect('accounts.db')
+        c2 = conn2.cursor()
+        c2.execute('''
+            INSERT INTO sold_properties (property_id, seller_username, agent_username, review_rating, review_text)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (property_id, session['username'], agent_username, rating, review))
+        conn2.commit()
+        conn2.close()
+
+        return jsonify({'success': True, 'message': 'Property marked as sold and review saved.'})
+    
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+
 @app.route('/change_password', methods=['GET', 'POST'])
 def change_password():
     if request.method == 'POST':
@@ -742,6 +780,26 @@ def view_listed_property():
 
     conn.close()
     return render_template('bidding.html', listings=final_listings)
+
+@app.route('/agent_profile/<username>')
+def agent_profile(username):
+    conn = sqlite3.connect('accounts.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    agent = c.execute("SELECT * FROM users WHERE username = ? AND user_type = 'agent'", (username,)).fetchone()
+    if not agent:
+        conn.close()
+        return "Agent not found", 404
+
+    reviews = c.execute('''
+        SELECT * FROM sold_properties
+        WHERE agent_username = ?
+    ''', (username,)).fetchall()
+
+    conn.close()
+    return render_template('agent_profile.html', agent=agent, reviews=reviews)
+
 
 @app.route('/view_bidded_property')
 def view_bidded_property():
