@@ -191,7 +191,7 @@
                                         <span class="aa-price">
                                             ${{ property['listing_price'] }}
                                         </span>
-                                        <a class="aa-secondary-btn" href="#" onclick="loadPropertyDetails('{{ property.id }}')">More Details</a>
+                                        <a class="aa-secondary-btn" onclick="loadPropertyDetails({{ property['id'] | tojson }})">More Details</a>
                                                                          
                                 </div>
                             </article>
@@ -316,75 +316,93 @@
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
   <script>
-    function loadPropertyDetails(propertyId) {
-  fetch(`/get_property_details/${propertyId}`)
-    .then(response => response.json())
-    .then(data => {
-      const property = data.property;
-      const bidders = data.bidders;
-
-      console.log("📦 Property fetched:", property);
-      console.log("👥 Bidders received:", bidders);
-
-      // Fill in property details
-      $('#modal-flat-type').text(property.flat_type);
-      $('#modal-town').text(property.town);
-      $('#modal-street-name').text(property.street_name);
-      $('#modal-floor-area').text(property.floor_area);
-      $('#modal-max-com-bid').text(property.max_com_bid);
-      $('#modal-years-remaining').text(property.years_remaining);
-      $('#modal-listing-price').text(property.listing_price);
-
-      // Clear previous bidders
-      $('#bidder-list').empty();
-
-      if (bidders.length > 0) {
-        bidders.forEach(bid => {
-          // Fallback-safe extraction
-          const username = bid.agent_username || bid[0];
-          const percent = bid.bid_percent || bid[1];
-
-          $('#bidder-list').append(`
-            <tr>
-              <td>${username}</td>
-              <td>${percent}%</td>
-              <td>
-                <button class="btn btn-success btn-sm" onclick="acceptBid(${property.id}, '${username}')">Accept</button>
-              </td>
-            </tr>
-          `);
-        });
-      } else {
-        $('#bidder-list').append(`
-          <tr>
-            <td colspan="3" class="text-center">No bids yet</td>
-          </tr>
-        `);
-      }
-
-      // Show the modal
-      $('#propertyModal').modal('show');
-    })
-    .catch(error => console.error("❌ Error fetching property details:", error));
-}
-  
-    function acceptBid(propertyId, agentUsername) {
-      fetch('/accept_bid', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          property_id: propertyId,
-          agent_username: agentUsername
-        })
-      })
-      .then(res => res.json())
-      .then(response => {
-        alert(response.message);
-        location.reload(); // Refresh to reflect changes
-      })
-      .catch(err => console.error("❌ Error accepting bid:", err));
-    }
+    console.log("🧠 JS script loaded!");
   </script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      console.log("✅ JS script loaded!");
+  
+      window.loadPropertyDetails = function (propertyId) {
+        console.log("🚀 loadPropertyDetails triggered for property ID:", propertyId);
+  
+        fetch(`/get_property_details/${propertyId}`)
+          .then(response => response.json())
+          .then(data => {
+            const property = data.property;
+            const bidders = data.bidders;
+  
+            console.log("📦 Property:", property);
+            console.log("👥 Bidders:", bidders);
+  
+            // Fill in modal details
+            $('#modal-flat-type').text(property.flat_type);
+            $('#modal-town').text(property.town);
+            $('#modal-street-name').text(property.street_name);
+            $('#modal-floor-area').text(property.floor_area);
+            $('#modal-max-com-bid').text(property.max_com_bid);
+            $('#modal-years-remaining').text(property.years_remaining);
+            $('#modal-listing-price').text(property.listing_price);
+  
+            // Clear bidder list
+            const $bidderList = $('#bidder-list');
+            $bidderList.empty();
+  
+            if (Array.isArray(bidders) && bidders.length > 0) {
+              bidders.sort((a, b) => a.bid_percent - b.bid_percent);
+
+              bidders.forEach(bid => {
+                console.log("🧪 Bidder raw data:", bid);
+
+                const username = bid.agent_username;
+                const percent = bid.bid_percent;
+
+                if (!username || percent === undefined || percent === null) {
+                  console.warn("⚠️ Skipping invalid bid:", bid);
+                  return;
+                }
+
+                $bidderList.append(`
+                  <tr>
+                    <td>${username}</td>
+                    <td>${percent.toFixed(1)}%</td>
+                    <td>
+                      <button class="btn btn-success btn-sm" onclick="acceptBid(${property.id}, '${username}')">
+                        Accept
+                      </button>
+                    </td>
+                  </tr>
+                `);
+              });
+            } else {
+              $bidderList.append(`<tr><td colspan="3" class="text-center">No bids yet</td></tr>`);
+            }
+  
+            $('#propertyModal').modal('show');
+          })
+          .catch(error => console.error("❌ Error fetching property details:", error));
+      };
+  
+      window.acceptBid = function (propertyId, agentUsername) {
+        fetch('/accept_bid', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            property_id: propertyId,
+            agent_username: agentUsername
+          })
+        })
+          .then(res => res.json())
+          .then(response => {
+            alert(response.message);
+            location.reload();
+          })
+          .catch(err => console.error("❌ Error accepting bid:", err));
+      };
+    });
+  </script>
+  
+  
+  
     
 
   </body>

@@ -240,10 +240,26 @@
               <h4>{{ property['flat_type'] }} in {{ property['town'] }}</h4>
               <p>{{ property['floor_area'] }} SQ FT | ${{ property['listing_price'] }}</p>
               <p>Max Commission: {{ property['max_com_bid'] }}%</p>
+              <strong style="color: black";>Status:</strong>
+            {% if property['status'] == 'A' %}
+                <span class="badge bg-success">Active</span>
+            {% elif property['status'] == 'C' %}
+                <span class="badge bg-danger">Sold</span>
+            {% else %}
+                <span class="badge bg-secondary">Closed</span>
+            {% endif %}
+            <br>
+             
+              {% if property['lowest_bid'] is not none %}
+              <p style="color: #555;"><strong>Lowest Bid:</strong> {{ property['lowest_bid'] }}%</p>
+            {% else %}
+              <p style="color: #999;"><em>No bids yet.</em></p>
+            {% endif %}
               <button class="bid-button"
               data-title="{{ property['flat_type'] }} in {{ property['town'] }}"
               data-max="{{ property['max_com_bid'] }}"
               data-property-id="{{ property['id'] }}"
+              data-status="{{ property['status'] }}"
               onclick="handleBidClick(this)">
               <strong>Bid</strong>
               </button>
@@ -297,59 +313,8 @@
     <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
     <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
     <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
-    <script>
-      let currentPropertyId = null;
-      let maxCommission = 0;
-    
-      function handleBidClick(btn) {
-        const title = btn.dataset.title;
-        const max = parseFloat(btn.dataset.max);
-        const id = btn.dataset.propertyId;
-    
-        currentPropertyId = id;
-        maxCommission = max;
-    
-        document.getElementById('property-name').innerText = `Bidding for: ${title}`;
-        document.getElementById('final-commission').value = '';
-        document.getElementById('final-commission').max = max;
-        document.getElementById('bidModal').style.display = 'block';
-      }
-    
-      function closeBidModal() {
-        document.getElementById('bidModal').style.display = 'none';
-      }
-    
-      async function placeBid() {
-        const commission = parseFloat(document.getElementById('final-commission').value);
-        if (isNaN(commission) || commission <= 0 || commission > maxCommission) {
-          alert(`Please enter a valid commission percentage (max: ${maxCommission}%)`);
-          return;
-        }
-    
-        try {
-          const response = await fetch('/submit_bid', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              property_id: currentPropertyId,
-              commission: commission
-            })
-          });
-    
-          const result = await response.json();
-          if (result.success) {
-            alert(result.message);
-            closeBidModal();
-            location.reload(); // Reload to reflect bid
-          } else {
-            alert(result.message || "Something went wrong.");
-          }
-        } catch (error) {
-          console.error("Error submitting bid:", error);
-          alert("Failed to submit bid.");
-        }
-      }
-    </script>
+    <script src="{{ url_for('static', filename='js/bidding.js') }}"></script>
+
   </body>
 
 

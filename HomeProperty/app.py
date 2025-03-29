@@ -484,7 +484,7 @@ import json
 def get_property_details(id):
     if 'username' not in session or session.get('user_type') != 'seller':
         return jsonify({'error': 'Unauthorized access'}), 403
-
+  
     conn = sqlite3.connect('listings.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
@@ -651,17 +651,22 @@ def list_property():
         # Create a listings table if it doesn't exist
        # Commenting out table creation since listings.db is already set up
         
-        """c.execute('''CREATE TABLE IF NOT EXISTS listings (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        seller_username TEXT NOT NULL,
-                        flat_type TEXT NOT NULL,
-                        town TEXT NOT NULL,
-                        street_name TEXT NOT NULL,
-                        floor_area INTEGER NOT NULL,
-                        max_com_bid REAL NOT NULL,
-                        years_remaining INTEGER NOT NULL,
-                        listing_price REAL NOT NULL
-                    )''')"""
+    
+        c.execute('''
+        CREATE TABLE IF NOT EXISTS listings (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            seller_username TEXT NOT NULL,
+            flat_type TEXT NOT NULL,
+            town TEXT NOT NULL,
+            street_name TEXT NOT NULL,
+            floor_area INTEGER NOT NULL,
+            max_com_bid REAL NOT NULL,
+            years_remaining INTEGER NOT NULL,
+            listing_price REAL NOT NULL,
+            bidders TEXT DEFAULT '[]',   -- 2D array of agent bids as JSON
+            status TEXT DEFAULT 'A'      -- A = active, B = closed, C = sold
+        )
+    ''')
     
         # Insert the property listing
         c.execute("INSERT INTO listings (seller_username, flat_type, town, street_name, floor_area, max_com_bid, years_remaining, listing_price, bidders, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
@@ -705,29 +710,75 @@ def agent_dashboard():
 
     return render_template('agent_dashboard.html', full_name=session.get('full_name'))
 
-@app.route('/view_listed_property') #View Property that have been listed by the Agents available for bidding
+@app.route('/view_listed_property')
 def view_listed_property():
     if 'username' not in session or session.get('user_type') != 'agent':
         flash("Access denied! Only agents can view this page.", "danger")
         return redirect(url_for('login'))
-    #return render_template('view_listed_property.html')
+
     conn = sqlite3.connect('listings.db')
     conn.row_factory = sqlite3.Row
     c = conn.cursor()
 
-    # ✅ This grabs ALL listings regardless of status or seller
     listings = c.execute("SELECT * FROM listings").fetchall()
-    print("[DEBUG] Listings fetched for agent:", [dict(row) for row in listings])
+    final_listings = []
+
+    for listing in listings:
+        listing_dict = dict(listing)
+        try:
+            import json
+            bidders = json.loads(listing['bidders']) if listing['bidders'] else []
+            # Get the minimum bid value
+            if bidders:
+                lowest_bid = min(bid[1] for bid in bidders)
+            else:
+                lowest_bid = None
+        except Exception as e:
+            print("Error parsing bidders:", e)
+            lowest_bid = None
+
+        listing_dict['lowest_bid'] = lowest_bid
+        final_listings.append(listing_dict)
 
     conn.close()
-    return render_template('bidding.html',listings=listings)
+    return render_template('bidding.html', listings=final_listings)
 
-@app.route('/view_bidded_property') #View Properties that you have bidded.
+@app.route('/view_bidded_property')
 def view_bidded_property():
     if 'username' not in session or session.get('user_type') != 'agent':
         flash("Access denied! Only agents can view this page.", "danger")
         return redirect(url_for('login'))
-    return render_template('view_bidded_property.html')
+
+    agent_username = session['username']
+
+    conn = sqlite3.connect('listings.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    all_listings = c.execute("SELECT * FROM listings").fetchall()
+    conn.close()
+
+    bidded_listings = []
+
+    import json
+    for listing in all_listings:
+        try:
+            bidders = json.loads(listing['bidders'])
+            lowest_bid = min([bid[1] for bid in bidders]) if bidders else None
+
+            for bidder in bidders:
+                if bidder[0] == agent_username:
+                    # Attach bid percent to listing for easy access in template
+                    listing_dict = dict(listing)
+                    listing_dict['your_bid'] = bidder[1]
+                    listing_dict['lowest_bid'] = lowest_bid
+                    bidded_listings.append(listing_dict)
+                    break
+        except Exception as e:
+            print("Error parsing bidders JSON:", e)
+
+    return render_template('view_bidded_property.html', listings=bidded_listings)
+
 
 
 #unused

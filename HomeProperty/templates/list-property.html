@@ -30,15 +30,6 @@
 
   </head>
 
-  <!-- Pre Loader -->
-  <div id="aa-preloader-area">
-    <div class="pulse"></div>
-  </div>
-  <!-- SCROLL TOP BUTTON -->
-    <a class="scrollToTop" href="#"><i class="fa fa-angle-double-up"></i></a>
-  <!-- END SCROLL TOP BUTTON -->
-
-
   <!-- Start header section -->
   <header id="aa-header">  
     <div class="container">
@@ -154,6 +145,16 @@
   <!-- End Proerty header  -->
   <section id="aa-error">
     <section class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} alert-dismissible fade in" role="alert" style="margin-top: 20px;">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span>&times;</span></button>
+                {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
       <form id="property-form" method="POST" action="/list-property">
           <!-- Flat Type -->
           <div class="form-group">
