@@ -95,13 +95,7 @@
         <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
             <li class="active"><a href="/">HOME</a></li>
             
-            <li class="dropdown">
-                <a class="dropdown-toggle" data-toggle="dropdown" href="/agent_dashboard">PROPERTIES <span class="caret"></span></a>
-                <ul class="dropdown-menu" role="menu">
-                    <li><a href="/agent_dashboard">PROPERTIES</a></li>
-                    <li><a href="/seller_dashboard">PROPERTIES DETAIL</a></li>                                            
-                </ul>
-            </li>
+            
 
             {% if 'username' in session %}
                 {% if session['user_type'] == 'seller' %}
