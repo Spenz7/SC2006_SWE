@@ -42,6 +42,12 @@
                 {% endif %}
               {% endwith %}
 
+              {% if error_message %}
+              <div class="alert alert-danger" role="alert">
+                {{ error_message }}
+              </div>
+            {% endif %}
+
               <form class="contactform" action="/login" method="POST">  
                 <div class="aa-single-field">
                     <label for="username">Username <span class="required">*</span></label>
@@ -66,7 +72,7 @@
                     <p>Don't have an account? <a href="/create_account">Register here!</a></p>
                 </div>
               </form>   
-
+            
               <!-- Forgot Password Section -->
               <div class="forgot-password" style="text-align: center; margin-top: 10px;">
                 <p>
@@ -89,5 +95,6 @@
   <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+
   </body>
 </html>

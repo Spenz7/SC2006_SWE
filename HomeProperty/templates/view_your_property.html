@@ -330,11 +330,14 @@
   <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/logout.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/viewyourpropertymodal.js') }}"></script>
   <script>
     console.log("🧠 JS script loaded!");
   </script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
+   /* document.addEventListener('DOMContentLoaded', function () {
       console.log("✅ JS script loaded!");
   
       window.loadPropertyDetails = function (propertyId) {
@@ -466,7 +469,7 @@
         location.reload();
       })
       .catch(err => console.error("❌ Error submitting review:", err));
-  };
+  }; */
 
   </script>
   

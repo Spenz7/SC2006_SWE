@@ -109,7 +109,7 @@
       var agentField = document.getElementById("agent-id-field");
       agentField.style.display = userType === "agent" ? "block" : "none";
     }
-
+      /*
     document.getElementById("get-otp").addEventListener("click", function() {
       var phoneNumber = document.getElementById("phone_number").value.trim();
 
@@ -144,7 +144,8 @@
       } else {
           alert("Please enter a valid 8-digit phone number.");
       }
-    });
+      
+    });*/
   </script>
 
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
@@ -154,5 +155,8 @@
   <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/registerOTP.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/registerAuthenticator.js') }}"></script>
+
   </body>
 </html>
