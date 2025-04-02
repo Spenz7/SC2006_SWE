@@ -275,7 +275,7 @@
           <span class="close" onclick="closeBidModal()">&times;</span>
           <h2 id="property-name"></h2>
           <label for="final-commission">Enter Commission (%)</label>
-          <input type="number" id="final-commission" class="form-control" placeholder="Enter commission percentage">
+          <input type="number" id="final-commission" class="form-control" placeholder="Enter commission percentage" step="0.1" min="0" oninput="validateDecimal(this)">
           <button class="bid-button" onclick="placeBid()">Submit Bid</button>
         </div>
       </div>
@@ -316,6 +316,14 @@
     <script src="{{ url_for('static', filename='js/bidding.js') }}"></script>
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
     <script src="{{ url_for('static', filename='js/logout.js') }}"></script>
+    <script>
+      function validateDecimal(input) {
+        const value = input.value;
+        if (!/^\d*(\.\d?)?$/.test(value)) {
+          input.value = value.slice(0, -1); // remove last character if it's invalid
+        }
+      }
+    </script>      
   </body>
 
 
