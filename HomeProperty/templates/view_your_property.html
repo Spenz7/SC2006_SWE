@@ -177,17 +177,32 @@
                                         <span>{{ property['floor_area'] }} SQ FT</span>
                                         <span>{{ property['years_remaining'] }} years remaining</span>
                                     </div>
-                                    <div class="aa-properties-about">
-                                        <h3><a href="#">Flat in {{ property['street_name'] }}</a></h3>
-                                        <p>This part should be trying to fetch data from the database, but not sure what to put here yet, might just change the UI for this part to make it cleaner, unless we want to include a part where seller input flat description</p>
-                                    </div>
                                     <div class="aa-properties-detial">
-                                        <span class="aa-price">
-                                            ${{ property['listing_price'] }}
+                                      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap;">
+                                    
+                                        <!-- Price on the left -->
+                                        <span class="aa-price" style="flex: 1;">
+                                          ${{ property['listing_price'] }}
                                         </span>
-                                        <a class="aa-secondary-btn" onclick="loadPropertyDetails({{ property['id'] | tojson }})">More Details</a>
-                                                                         
-                                </div>
+                                    
+                                        <!-- Review Agent centered -->
+                                        {% if property['status'] == 'C' %}
+                                          <div style="flex: 1; text-align: center;">
+                                            <a class="btn btn-success" onclick="openReviewAgentModal({{ property['id'] }})">
+                                              Review Agent
+                                            </a>
+                                          </div>
+                                        {% endif %}
+                                    
+                                        <!-- More Details on the right -->
+                                        <div style="flex: 1; text-align: right;">
+                                          <a class="aa-secondary-btn" onclick="loadPropertyDetails({{ property['id'] }})">
+                                            More Details
+                                          </a>
+                                        </div>
+                                    
+                                      </div>
+                                    </div>                                                                   
                             </article>
                         </li>
                     {% endfor %}
@@ -224,6 +239,31 @@
     </div>
   </section>
   <!-- / Properties  --> 
+
+  <!-- Review Agent Modal -->
+  <div class="modal fade" id="reviewAgentModal" tabindex="-1" role="dialog" aria-labelledby="reviewAgentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="color:black;">
+        <div class="modal-header">
+          <h5 class="modal-title">Review Agent</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span>&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Agent Username:</strong> <span id="review-agent-username"></span></p>
+          <label for="review-rating">Rating (1 to 5):</label>
+          <input type="number" id="review-rating" class="form-control" min="1" max="5">
+
+          <label for="review-text">Review:</label>
+          <textarea id="review-text" class="form-control" rows="3" placeholder="Write your feedback..."></textarea>
+
+          <button class="btn btn-danger mt-3" onclick="submitReview()">Submit Review</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 
   <!-- Footer -->
   <footer id="aa-footer">
@@ -297,20 +337,6 @@
             <!-- Filled by JavaScript -->
           </tbody>
         </table>
-
-        <!-- Review form for selected agent -->
-        <div id="review-section" style="display:none; margin-top: 20px;">
-          <h5>Review Selected Agent</h5>
-          <p><strong>Selected Agent:</strong> <span id="selected-agent-name" style="color: #333;"></span></p>
-          <label for="review-rating">Rating (1 to 5):</label>
-          <input type="number" id="review-rating" class="form-control" min="1" max="5" required>
-        
-          <label for="review-text">Review:</label>
-          <textarea id="review-text" class="form-control" rows="3" placeholder="Enter your feedback..."></textarea>
-        
-          <button class="btn btn-danger mt-2" onclick="submitMarkAsSold()">Mark as Sold</button>
-        </div>
-        
         </table>
       </div>
     </div>
@@ -407,23 +433,14 @@
             agent_username: agentUsername
           })
         })
-          .then(res => res.json())
-          .then(response => {
-            alert(response.message);
-
-            // ✅ Save selected data for marking sold
-            window.selectedPropertyId = propertyId;
-            window.selectedAgent = agentUsername;
-
-            document.getElementById('selected-agent-name').textContent = agentUsername;
-            document.getElementById('review-rating').value = '';
-            document.getElementById('review-text').value = '';
-            document.getElementById('review-section').style.display = 'block';
-          })
-
-          .catch(err => console.error("❌ Error accepting bid:", err));
+        .then(res => res.json())
+        .then(response => {
+          alert(response.message);
+          location.reload();
+        })
+        .catch(err => console.error("❌ Error accepting bid:", err));
       };
-    });
+
 
     function viewAgentProfile(username) {
       fetch(`/agent_profile/${username}`)
@@ -465,6 +482,68 @@
       .catch(err => console.error("❌ Error submitting review:", err));
   }; */
 
+  </script>
+  
+  <script>
+    let currentReviewPropertyId = null;
+    let currentAgentUsername = null;
+  
+    function openReviewAgentModal(propertyId) {
+      // Get the accepted agent from backend
+      fetch(`/get_property_details/${propertyId}`)
+        .then(res => res.json())
+        .then(data => {
+          const property = data.property;
+          const bidders = data.bidders;
+  
+          // Assuming first bidder was accepted (can improve this)
+          if (!bidders || bidders.length === 0) {
+            alert("No accepted agent found.");
+            return;
+          }
+  
+          const acceptedAgent = bidders[0].agent_username;
+          currentReviewPropertyId = propertyId;
+          currentAgentUsername = acceptedAgent;
+          document.getElementById('review-agent-username').textContent = acceptedAgent;
+          $('#reviewAgentModal').modal('show');
+        })
+        .catch(err => {
+          console.error("Failed to load agent info:", err);
+          alert("Something went wrong.");
+        });
+    }
+  
+    function submitReview() {
+      const rating = parseInt(document.getElementById('review-rating').value);
+      const review = document.getElementById('review-text').value;
+  
+      if (!rating || rating < 1 || rating > 5) {
+        alert("Rating must be between 1 and 5.");
+        return;
+      }
+  
+      fetch('/mark_as_sold', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          property_id: currentReviewPropertyId,
+          agent_username: currentAgentUsername,
+          rating: rating,
+          review: review
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+          $('#reviewAgentModal').modal('hide');
+          location.reload();
+        })
+        .catch(err => {
+          console.error("Failed to submit review:", err);
+          alert("Error submitting review.");
+        });
+    }
   </script>
   
   
