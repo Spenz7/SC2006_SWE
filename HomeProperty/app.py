@@ -613,7 +613,6 @@ def seller_dashboard():
 
     return render_template('seller_dashboard.html', full_name=session.get('full_name'))
 
-# View Sellers own Properties (Seller)
 @app.route('/view_your_property')
 def view_your_property():
     if 'username' not in session or session.get('user_type') != 'seller':
@@ -621,22 +620,31 @@ def view_your_property():
         return redirect(url_for('login'))
 
     username = session['username']
+    page = int(request.args.get('page', 1))  # Get current page from query param
+    per_page = 15
 
     try:
-        # Connect to the database
         conn = sqlite3.connect('listings.db')
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        # Check if 'listings' table exists
-        c.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='listings'")
-        if not c.fetchone():
-            flash("No properties have been listed yet. Please list a property first.", "warning")
-            return redirect(url_for('list_property'))
+        c.execute("SELECT COUNT(*) FROM listings WHERE seller_username = ?", (username,))
+        total_properties = c.fetchone()[0]
 
-        # Fetch seller's properties
-        properties = c.execute("SELECT * FROM listings WHERE seller_username = ?", (username,)).fetchall()
-        return render_template('view_your_property.html', properties=properties)
+        offset = (page - 1) * per_page
+        properties = c.execute("""
+            SELECT * FROM listings
+            WHERE seller_username = ?
+            ORDER BY id DESC
+            LIMIT ? OFFSET ?
+        """, (username, per_page, offset)).fetchall()
+
+        total_pages = (total_properties + per_page - 1) // per_page  # Ceiling division
+
+        return render_template('view_your_property.html',
+                               properties=properties,
+                               page=page,
+                               total_pages=total_pages)
 
     except Exception as e:
         flash(f"An unexpected error occurred: {str(e)}", "danger")
@@ -644,6 +652,7 @@ def view_your_property():
 
     finally:
         conn.close()
+
 
 import json
 

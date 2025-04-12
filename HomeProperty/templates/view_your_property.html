@@ -171,18 +171,24 @@
                                     <img alt="img" src="{{ url_for('static', filename='img/item/6.jpg') }}">
                                 </a>
                                 <div class="aa-properties-item-content">
-                                    <div class="aa-properties-info">
-                                        <span>{{ property['flat_type'] }}</span>
-                                        <span>{{ property['town'] }}</span>
-                                        <span>{{ property['floor_area'] }} SQ FT</span>
-                                        <span>{{ property['years_remaining'] }} years remaining</span>
-                                    </div>
+                                  <div class="aa-properties-info">
+                                    <h4 style="margin-top: 0;">
+                                      {% if property['flat_type'] in ['4 ROOM', '5 ROOM', 'MULTI-GENERATION'] %}
+                                        {{ property['flat_type'] }} Flat in {{ property['town'] }}
+                                      {% elif property['flat_type'] == 'EXECUTIVE' %}
+                                        EXECUTIVE Apartment in {{ property['town'] }}
+                                      {% else %}
+                                        {{ property['flat_type'] }} in {{ property['town'] }}
+                                      {% endif %}
+                                    </h4>
+                                    <p>{{ property['floor_area'] }} SQ FT | {{ property['years_remaining'] }} Years Remaining</p>
+                                  </div>
                                     <div class="aa-properties-detial">
                                       <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap;">
                                     
                                         <!-- Price on the left -->
                                         <span class="aa-price" style="flex: 1;">
-                                          ${{ property['listing_price'] }}
+                                          Listed for: ${{ "{:,.1f}".format(property['listing_price']) }}
                                         </span>
                                     
                                         <!-- Review Agent centered -->
@@ -197,7 +203,7 @@
                                         <!-- More Details on the right -->
                                         <div style="flex: 1; text-align: right;">
                                           <a class="aa-secondary-btn" onclick="loadPropertyDetails({{ property['id'] }})">
-                                            More Details
+                                            View Biddings
                                           </a>
                                         </div>
                                     
@@ -212,26 +218,34 @@
             </ul>            
             </div>
             <!-- Start properties content bottom -->
+            <!-- Start properties content bottom -->
             <div class="aa-properties-content-bottom">
-              <nav>
-                <ul class="pagination">
-                  <li>
-                    <a href="#" aria-label="Previous">
-                      <span aria-hidden="true">&laquo;</span>
-                    </a>
-                  </li>
-                  <li><a href="#">1</a></li>
-                  <li><a href="#">2</a></li>
-                  <li class="active"><a href="#">3</a></li>
-                  <li><a href="#">4</a></li>
-                  <li><a href="#">5</a></li>
-                  <li>
-                    <a href="#" aria-label="Next">
-                      <span aria-hidden="true">&raquo;</span>
-                    </a>
-                  </li>
-                </ul>
-              </nav>
+              {% if total_pages > 1 %}
+                <nav>
+                  <ul class="pagination">
+                    <!-- Previous button -->
+                    <li class="{% if page == 1 %}disabled{% endif %}">
+                      <a href="{{ url_for('view_your_property', page=page-1) }}" aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                      </a>
+                    </li>
+
+                    <!-- Page numbers -->
+                    {% for p in range(1, total_pages + 1) %}
+                      <li class="{% if p == page %}active{% endif %}">
+                        <a href="{{ url_for('view_your_property', page=p) }}">{{ p }}</a>
+                      </li>
+                    {% endfor %}
+
+                    <!-- Next button -->
+                    <li class="{% if page == total_pages %}disabled{% endif %}">
+                      <a href="{{ url_for('view_your_property', page=page+1) }}" aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                      </a>
+                    </li>
+                  </ul>
+                </nav>
+              {% endif %}
             </div>
           </div>
         </div>
