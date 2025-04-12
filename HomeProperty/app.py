@@ -85,13 +85,11 @@ def parse_remaining_lease(lease_str):
         print(f"Error parsing lease string: {e}")
         return 0  # Return 0 if parsing fails
 
-def fetch_resale_data_from_api(flat_type, town, floor_area, remaining_lease, offset=0):
+import json  # Ensure this is imported at the top
+
+def fetch_resale_data_from_api(flat_type, town, offset=0):
     params = {
-        'flat_type': flat_type,
-        'town': town,
-        'floor_area_sqm': floor_area,
-        'remaining_lease': remaining_lease,
-        'limit': PAGE_SIZE,  # Fetch 100 records at a time
+        'limit': PAGE_SIZE,
         'offset': offset
     }
 
@@ -100,12 +98,10 @@ def fetch_resale_data_from_api(flat_type, town, floor_area, remaining_lease, off
         response.raise_for_status()
 
         data = response.json()
-        print(f"Fetched data: {data}")  # Debugging: Print raw API response
-        
         if 'result' in data and 'records' in data['result']:
             return data['result']['records'], data['result']['total']
         else:
-            return [], 0  # No records found
+            return [], 0
     except requests.exceptions.RequestException as e:
         print(f"Error fetching data from API: {e}")
         return [], 0
@@ -113,72 +109,65 @@ def fetch_resale_data_from_api(flat_type, town, floor_area, remaining_lease, off
 def filter_and_sort_records(records, flat_type, town, min_area=None, max_area=None, min_lease=None, max_lease=None):
     filtered = []
     for record in records:
+        # Filter by flat type and town
         if record.get("flat_type") != flat_type or record.get("town") != town:
             continue
 
+        # Filter by area range
         area = float(record.get("floor_area_sqm", 0))
-        lease = parse_remaining_lease(record.get("remaining_lease", "0 years 0 months"))
-        '''
         if min_area is not None and (area < min_area or area > max_area):
             continue
+
+        # Filter by lease range
+        lease = parse_remaining_lease(record.get("remaining_lease", "0 years 0 months"))
         if min_lease is not None and (lease < min_lease or lease > max_lease):
             continue
-        '''
+        
         filtered.append(record)
 
-    # Sort by the 'month' (date), assuming it's in 'YYYY-MM' format
+    # Sort by the 'month' field (assuming 'month' is in 'YYYY-MM' format)
     filtered = sorted(filtered, key=lambda x: x.get('month', ''), reverse=True)
+    
     return filtered
 
-
-def find_similar_past_prices(flat_type, town, floor_area, remaining_lease, pages_to_fetch=5, max_time=60):
+def find_similar_past_prices(flat_type, town, floor_area, remaining_lease, max_time=60):
     all_records = []
-    total_records = 1  # Start with a dummy value to enter the loop
-    page = 0
-    start_time = time.time()  # Start the timer
+    start_time = time.time()  # Start timer
 
     print(f"🔍 Starting to fetch records for flat_type: {flat_type}, town: {town}, floor_area: {floor_area}, remaining_lease: {remaining_lease}")
 
-    # Step 1: Fetch the total number of records first
-    records, total_records = fetch_resale_data_from_api(flat_type, town, floor_area, remaining_lease, 0)
+    # Step 1: Fetch the total number of records
+    records, total_records = fetch_resale_data_from_api(flat_type, town, offset=0)
 
     if total_records == 0:
         print("❌ No records found")
         return []
 
-    # Calculate the last page based on total records and page size (100)
     total_pages = total_records // PAGE_SIZE + (1 if total_records % PAGE_SIZE else 0)
+    print(f"Total pages: {total_pages}, total records: {total_records}")
 
-    print(f"Total pages to fetch: {total_pages}")
-
-    # Step 2: Fetch records starting from the last page, moving backward toward the first page
-    while page < pages_to_fetch and total_pages - page > 0:
-        # Check if we've exceeded the time limit
+    # Step 2: Start from the last offset and move backward
+    offset = total_records - PAGE_SIZE
+    while offset >= 0:
         elapsed_time = time.time() - start_time
         if elapsed_time > max_time:
             print(f"⏱️ Time limit of {max_time} seconds reached. Returning fetched records.")
             break
 
-        # Calculate offset to fetch from the last page
-        offset = (total_pages - page - 1) * PAGE_SIZE  # Start from the last page
-
-        print(f"Fetching page {total_pages - page}, offset: {offset}, total records: {total_records}")
-        print(f"Elapsed time: {elapsed_time} seconds")  # Debug elapsed time
-
-        records, _ = fetch_resale_data_from_api(flat_type, town, floor_area, remaining_lease, offset)
+        print(f"Fetching records at offset: {offset}, elapsed: {elapsed_time:.2f}s")
+        records, _ = fetch_resale_data_from_api(flat_type=flat_type, town=town, offset=offset)
 
         if not records:
-            print("❌ No records found on this page.")
+            print("❌ No records at this offset. Stopping.")
             break
 
-        # Print the actual records fetched for debugging
         for record in records:
-            print(f"Record fetched - {record}")  # Display each record fetched
+            print(f"Record fetched - {record}")  # Optional: debug output
 
         all_records.extend(records)
-        page += 1  # Move to the next page (backward)
+        offset -= PAGE_SIZE  # Move to previous page
 
-    # Step 3: Apply filters and sort the records
+    # Step 3: Apply filters and sort
     filtered_records = filter_and_sort_records(
         all_records,
         flat_type,
@@ -189,11 +178,11 @@ def find_similar_past_prices(flat_type, town, floor_area, remaining_lease, pages
         max_lease=int(remaining_lease) + 5
     )
 
-    # Debugging: Print the number of filtered records
-    print(f"Number of records after filtering and sorting: {len(filtered_records)}")
+    print(f"✅ Filtered and sorted records count: {len(filtered_records)}")
 
-    # Step 4: Return the top 5 most recent results
+    # Step 4: Return top 5 recent results
     return filtered_records[:5]
+
 '''
 def load_resale_data():
     records = []
@@ -610,7 +599,7 @@ def logout():
 def test_prices():
     try:
         # Set the max time limit (60 seconds)
-        results = find_similar_past_prices("3 ROOM", "ANG MO KIO", 67, 62, pages_to_fetch=5, max_time=60)
+        results = find_similar_past_prices("3 ROOM", "ANG MO KIO", 67, 62, pages_to_fetch=10, max_time=60)
         return jsonify(results)
     except Exception as e:
         print(f"❌ Error in test_prices: {e}")
@@ -862,22 +851,23 @@ def list_property():
 
 @app.route('/get_similar_prices')
 def get_similar_prices():
-    flat_type = request.args.get("flat_type")
-    town = request.args.get("town")
-    floor_area = request.args.get("floor_area")
-    years_remaining = request.args.get("years_remaining")
-
-    if not all([flat_type, town, floor_area, years_remaining]):
-        return jsonify({"error": "Missing parameters"}), 400
-
     try:
-        print("🔍 Params received:", flat_type, town, floor_area, years_remaining)
-        results = find_similar_past_prices(flat_type, town, int(floor_area), int(years_remaining))
-        print("✅ Matching results:", results)
+        flat_type = request.args.get('flat_type')
+        town = request.args.get('town')
+        floor_area = float(request.args.get('floor_area'))
+        years_remaining = float(request.args.get('years_remaining'))
+
+        results = find_similar_past_prices(flat_type, town, floor_area, years_remaining)
+
+        print("🔁 FINAL 5 RESULTS TO RETURN:")
+        for i, r in enumerate(results, start=1):
+            print(f"{i}. {r}")
+
         return jsonify(results)
+
     except Exception as e:
-        print("❌ Error in get_similar_prices:", e)
-        return jsonify({"error": str(e)}), 500
+        print(f"❌ Error in get_similar_prices: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 # For Agent Dashbaords.
 @app.route('/agent_dashboard')
