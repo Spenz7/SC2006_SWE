@@ -95,11 +95,11 @@
         <!-- Text based logo -->
         <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
         <!-- Image based logo -->
-        <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
+        <!--<a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> -->
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
-            <li class="active"><a href="/">HOME</a></li>
+            <li><a href="/">HOME</a></li>
             
           
 
@@ -107,7 +107,7 @@
                 {% if session['user_type'] == 'seller' %}
                     <!-- Seller-specific menu -->
                     <li><a href="/list-property">List Property</a></li>
-                    <li><a href="/view_your_property">Your Property</a></li>
+                    <li class="active"><a href="/view_your_property">Your Property</a></li>
                 
                 {% elif session['user_type'] == 'agent' %}
                     <!-- Agent-specific menu -->

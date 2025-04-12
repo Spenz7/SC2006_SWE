@@ -151,7 +151,7 @@
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
-              <li class="active"><a href="/">HOME</a></li>
+              <li><a href="/">HOME</a></li>
               
               <!--
               <li class="dropdown">
@@ -171,7 +171,7 @@
                   
                   {% elif session['user_type'] == 'agent' %}
                       <!-- Agent-specific menu -->
-                      <li><a href="/view_listed_property">View Listed Property</a></li>
+                      <li class="active"><a href="/view_listed_property">View Listed Property</a></li>
                       <li><a href="/view_bidded_property">View Bidded Property</a></li>
                   {% endif %}
                   
