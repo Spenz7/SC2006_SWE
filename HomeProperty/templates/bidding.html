@@ -234,7 +234,8 @@
 
       <section class="container mt-4">
         <div class="property-grid">
-          {% for property in listings %}
+          {% for property in listings if property['status'] == 'A' %}
+
             <div class="property-card">
               <img src="{{ url_for('static', filename='img/item1.jpg') }}" alt="Property Image">
               <h4>{{ property['flat_type'] }} in {{ property['town'] }}</h4>
