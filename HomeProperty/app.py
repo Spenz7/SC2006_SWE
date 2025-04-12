@@ -598,8 +598,36 @@ def test_prices():
 def seller_dashboard():
     if 'username' not in session:
         return redirect(url_for('login'))  # Ensure user is logged in
+     # Connect to both databases
+    conn1 = sqlite3.connect('listings.db')
+    conn1.row_factory = sqlite3.Row
+    c1 = conn1.cursor()
 
-    return render_template('seller_dashboard.html', full_name=session.get('full_name'))
+    conn2 = sqlite3.connect('accounts.db')
+    conn2.row_factory = sqlite3.Row
+    c2 = conn2.cursor()
+
+    # Get all sold property records (ensures valid agent/seller info)
+    sold_records = c2.execute("SELECT * FROM sold_properties").fetchall()
+
+    sold_properties = []
+
+    for record in sold_records:
+        property_id = record['property_id']
+        agent_username = record['agent_username']
+        seller_username = record['seller_username']
+
+        # Fetch corresponding listing from listings.db
+        listing = c1.execute("SELECT * FROM listings WHERE id = ?", (property_id,)).fetchone()
+        if listing:
+            listing_dict = dict(listing)
+            listing_dict['agent_username'] = agent_username
+            listing_dict['seller_username'] = seller_username
+            sold_properties.append(listing_dict)
+
+    conn1.close()
+    conn2.close()
+    return render_template('seller_dashboard.html', sold_listings=sold_properties, full_name=session.get('full_name'))
 
 @app.route('/view_your_property')
 def view_your_property():
@@ -861,14 +889,44 @@ def get_similar_prices():
         print(f"❌ Error in get_similar_prices: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
-# For Agent Dashbaords.
+
 @app.route('/agent_dashboard')
 def agent_dashboard():
     if 'username' not in session or session.get('user_type') != 'agent':
         flash("Access denied! Only agents can view this page.", "danger")
         return redirect(url_for('login'))
+     # Connect to both databases
+    conn1 = sqlite3.connect('listings.db')
+    conn1.row_factory = sqlite3.Row
+    c1 = conn1.cursor()
 
-    return render_template('agent_dashboard.html', full_name=session.get('full_name'))
+    conn2 = sqlite3.connect('accounts.db')
+    conn2.row_factory = sqlite3.Row
+    c2 = conn2.cursor()
+
+    # Get all sold property records (ensures valid agent/seller info)
+    sold_records = c2.execute("SELECT * FROM sold_properties").fetchall()
+
+    sold_properties = []
+
+    for record in sold_records:
+        property_id = record['property_id']
+        agent_username = record['agent_username']
+        seller_username = record['seller_username']
+
+        # Fetch corresponding listing from listings.db
+        listing = c1.execute("SELECT * FROM listings WHERE id = ?", (property_id,)).fetchone()
+        if listing:
+            listing_dict = dict(listing)
+            listing_dict['agent_username'] = agent_username
+            listing_dict['seller_username'] = seller_username
+            sold_properties.append(listing_dict)
+
+    conn1.close()
+    conn2.close()
+    return render_template('agent_dashboard.html', sold_listings=sold_properties, full_name=session.get('full_name'))
+
+
 
 @app.route('/view_listed_property')
 def view_listed_property():
@@ -982,7 +1040,38 @@ def gallery():
 # Home route with buttons
 @app.route('/')
 def index():
-    return render_template('index.html')
+    # Connect to both databases
+    conn1 = sqlite3.connect('listings.db')
+    conn1.row_factory = sqlite3.Row
+    c1 = conn1.cursor()
+
+    conn2 = sqlite3.connect('accounts.db')
+    conn2.row_factory = sqlite3.Row
+    c2 = conn2.cursor()
+
+    # Get all sold property records (ensures valid agent/seller info)
+    sold_records = c2.execute("SELECT * FROM sold_properties").fetchall()
+
+    sold_properties = []
+
+    for record in sold_records:
+        property_id = record['property_id']
+        agent_username = record['agent_username']
+        seller_username = record['seller_username']
+
+        # Fetch corresponding listing from listings.db
+        listing = c1.execute("SELECT * FROM listings WHERE id = ?", (property_id,)).fetchone()
+        if listing:
+            listing_dict = dict(listing)
+            listing_dict['agent_username'] = agent_username
+            listing_dict['seller_username'] = seller_username
+            sold_properties.append(listing_dict)
+
+    conn1.close()
+    conn2.close()
+    
+    return render_template('index.html', sold_listings=sold_properties)
+
 
 if __name__ == '__main__':
     init_db()

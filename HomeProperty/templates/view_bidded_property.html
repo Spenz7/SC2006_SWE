@@ -155,12 +155,23 @@
 </section>
 
 <div class="bidded-properties-container">
-  <div class="container" style="margin-top: 30px";>
+
     <h2>Your Bidded Properties</h2>
+    <div class="container" style="margin-top: 30px";>
+      <div class="form-group mb-4">
+        <label for="statusFilter"><strong>Filter by Status:</strong></label>
+        <select id="statusFilter" class="form-control" onchange="filterProperties()">
+          <option value="all">All</option>
+          <option value="A">Active</option>
+          <option value="C">Sold</option>
+          <option value="X">Closed</option>
+        </select>
+      </div>
     {% if listings %}
       <div class="row">
         {% for listing in listings %}
-          <div class="col-md-4 mb-4">
+        <div class="col-md-4 mb-4 property-card status-{{ listing['status'] }}">
+
             <div class="card">
               <img src="{{ url_for('static', filename='img/item/1.jpg') }}" class="card-img-top" alt="Property Image">
               <div class="card-body">
@@ -226,7 +237,20 @@
     </div>
   </div>
 </footer>
-
+<script>
+  function filterProperties() {
+    const selectedStatus = document.getElementById('statusFilter').value;
+    const cards = document.querySelectorAll('.property-card');
+  
+    cards.forEach(card => {
+      if (selectedStatus === 'all') {
+        card.style.display = 'block';
+      } else {
+        card.style.display = card.classList.contains(`status-${selectedStatus}`) ? 'block' : 'none';
+      }
+    });
+  }
+  </script>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
 <script src="{{ url_for('static', filename='js/slick.js') }}"></script>
