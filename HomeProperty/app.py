@@ -38,6 +38,295 @@ def init_db():
     conn.commit()
     conn.close()
 
+#go to http://localhost:5000/view_accounts to view
+@app.route('/view_accounts')
+def view_accounts():
+    conn = sqlite3.connect('accounts.db')
+    c = conn.cursor()
+    c.execute("SELECT * FROM users")  # Fetch all accounts
+    accounts = c.fetchall()  # Get all results
+    conn.close()
+    
+    # Display the accounts
+    return f"Accounts in database: {accounts}"
+
+# Function to check if agent ID exists in data.gov.sg API
+def check_agent_id(agent_id):
+    dataset_id = "d_07c63be0f37e6e59c07a4ddc2fd87fcb"
+    url = f"https://data.gov.sg/api/action/datastore_search?resource_id={dataset_id}"
+    
+    try:
+        response = requests.get(url)
+        data = response.json()
+        
+        if 'result' in data and 'records' in data['result']:
+            records = data['result']['records']
+            
+            for record in records:
+                if record.get('registration_no') == agent_id:
+                    return True  # Agent ID found
+    except Exception as e:
+        print("Error fetching agent data:", e)
+    
+    return False  # Agent ID not found
+
+# Twilio credentials
+account_sid = '***REMOVED***'  # Replace with your Twilio Account SID
+auth_token = '***REMOVED***'  # Replace with your Twilio Auth Token
+twilio_number = '***REMOVED***'  # Replace with your Twilio phone number
+
+def generate_otp():
+    otp = random.randint(100000, 999999)  # Generates a 6-digit OTP
+    return otp
+
+# Function to send OTP via SMS using Twilio
+def send_otp_sms(phone_number):
+    otp = generate_otp()
+    
+    # Store OTP in session
+    session['otp'] = otp
+    print("DEBUG: OTP stored in session:", session.get('otp'))  # Add this line to debug
+
+    # Create Twilio client
+    client = Client(account_sid, auth_token)
+    
+    # Send OTP SMS
+    message = client.messages.create(
+        body=f'Your OTP is {otp}',  # Message body
+        from_=twilio_number,  # Your Twilio phone number
+        to=phone_number  # The phone number to send OTP to
+    )
+    
+    return message.sid  # Optionally return SID for logging/debugging
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    try:
+        # Read JSON data
+        data = request.get_json()
+        phone_number = data['phone_number'].strip()
+
+        # Check if the phone number is valid (starts with +65 for Singapore)
+        if not phone_number.startswith('+65'):
+            return jsonify({'success': False, 'message': 'Phone number must start with +65.'}), 400
+
+        # Generate OTP and store in session
+        otp = generate_otp()
+        session['otp'] = otp
+
+        # Send OTP via Twilio
+        message_sid = send_otp_sms(phone_number)  # Use the function to send OTP SMS
+
+        # Return a success response
+        return jsonify({'success': True, 'message': 'OTP sent successfully.'})
+
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 400
+
+def is_strong_password(password):
+    """Check if the password meets strength requirements."""
+    if len(password) < 8:
+        return False
+    if not re.search(r'[A-Z]', password):  # Check for uppercase letter
+        return False
+    if not re.search(r'[a-z]', password):  # Check for lowercase letter
+        return False
+    if not re.search(r'[0-9]', password):  # Check for a digit
+        return False
+    if not re.search(r'[\W_]', password):  # Check for special character
+        return False
+    return True
+
+
+@app.route('/create_account', methods=['GET', 'POST'])
+def create_account():
+    if request.method == 'POST':
+        full_name = request.form['full_name'].strip()
+        username = request.form['username'].strip()
+        password = request.form['password'].strip()
+        confirm_password = request.form['confirm-password'].strip()
+        phone_number = request.form['phone_number'].strip()
+        user_type = request.form['user-type'].strip()
+
+        # Validate password match
+        if password != confirm_password:
+            error_message = "Passwords do not match."
+            return render_template('create_account.html', error_message=error_message)
+        
+        # Validate password strength
+        if not is_strong_password(password):
+            error_message = "Password must be at least 8 characters long, contain both upper and lower case letters, a number, and a special character."
+            return render_template('create_account.html', error_message=error_message)
+
+        # Prepend +65 if not present
+        if not phone_number.startswith('+65'):
+            phone_number = '+65' + phone_number
+
+        otp = request.form.get('otp')  # Get OTP from form
+        print("DEBUG: OTP entered:", otp)  # Add this line to debug
+        
+        if otp:
+            # Ensure OTP is treated as an integer
+            otp = int(otp)  # Convert OTP from form to integer
+            
+            if 'otp' not in session or session['otp'] != otp:
+                error_message = "Invalid OTP. Please try again."
+                return render_template('create_account.html', error_message=error_message)
+            
+            del session['otp']  # Clear OTP from session after successful verification
+
+        # Initialize database connection
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+
+        # Check if username already exists
+        c.execute("SELECT * FROM users WHERE username=?", (username,))
+        if c.fetchone():
+            conn.close()
+            error_message = "Username already taken. Please choose another one."
+            return render_template('create_account.html', error_message=error_message)
+        
+        # allow duplicate phone number cuz free trial account only allows 1 number
+        # # Check if phone number already exists
+        # c.execute("SELECT * FROM users WHERE phone_number=?", (phone_number,))
+        # if c.fetchone():
+        #     conn.close()
+        #     error_message = "Phone number already in use. Please use a different number."
+        #     return render_template('create_account.html', error_message=error_message)
+
+        # Insert into the database
+        if user_type == 'seller':
+            c.execute("INSERT INTO users (full_name, username, password, phone_number, user_type) VALUES (?, ?, ?, ?, ?) ",
+                      (full_name, username, password, phone_number, user_type))
+        
+        elif user_type == 'agent':
+            agent_id = request.form.get('agent_id', '').strip()
+            
+            if not agent_id:
+                conn.close()
+                error_message = "Agent registration number is required."
+                return render_template('create_account.html', error_message=error_message)
+
+            if not check_agent_id(agent_id):
+                conn.close()
+                error_message = "Invalid agent registration number. Please enter a valid ID."
+                return render_template('create_account.html', error_message=error_message)
+
+            c.execute("INSERT INTO users (full_name, username, password, phone_number, user_type, agent_id) VALUES (?, ?, ?, ?, ?, ?) ",
+                      (full_name, username, password, phone_number, user_type, agent_id))
+        
+        else:
+            conn.close()
+            error_message = "Invalid user type selected."
+            return render_template('create_account.html', error_message=error_message)
+
+        # Commit changes and close connection
+        conn.commit()
+        conn.close()
+
+        flash("Account created successfully!", "success")
+        return redirect(url_for('login'))  # Redirect to login page after successful account creation
+
+    else:
+        # Display the account creation form with OTP field
+        phone_number = request.args.get('phone_number')
+        return render_template('create_account.html', show_otp=True, phone_number=phone_number)
+        
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        username = request.form['username'].strip()
+        phone_number = request.form['phone_number'].strip()
+
+        # Ensure phone number starts with +65
+        if not phone_number.startswith('+65'):
+            phone_number = '+65' + phone_number
+
+        otp = request.form.get('otp')  # OTP entered by the user
+        new_password = request.form['new_password'].strip()
+        confirm_new_password = request.form['confirm_new_password'].strip()
+
+        # Check if the OTP is correct
+        if 'otp' not in session or session['otp'] != int(otp):
+            flash("Invalid OTP. Please try again.", "error")
+            return redirect(url_for('change_password'))
+
+        # Check if the new password and confirm password match
+        if new_password != confirm_new_password:
+            flash("Passwords do not match. Please try again.", "error")
+            return redirect(url_for('change_password'))
+
+        # Validate password strength
+        if not is_strong_password(new_password):
+            flash("Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a digit, and a special character.", "error")
+            return redirect(url_for('change_password'))
+
+        # Validate phone number (check if it matches the user in DB)
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username=? AND phone_number=?", (username, phone_number))
+        user = c.fetchone()
+        conn.close()
+
+        if not user:
+            flash("User not found or phone number mismatch.", "error")
+            return redirect(url_for('change_password'))
+
+        # Store the raw password in the database (no hashing)
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+        c.execute("UPDATE users SET password=? WHERE username=?", (new_password, username))
+        conn.commit()
+        conn.close()
+
+        flash("Password changed successfully!", "success")
+        return redirect(url_for('login'))
+
+    return render_template('change_password.html')
+    
+# Login route
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        user_type = request.form['user_type']  # Get the user type from the form
+
+        # Check if the user exists in the database with the selected user_type
+        conn = sqlite3.connect('accounts.db')
+        c = conn.cursor()
+        c.execute("SELECT * FROM users WHERE username=? AND password=? AND user_type=?", 
+          (username.strip(), password.strip(), user_type.strip()))
+        user = c.fetchone()  # Fetch one row matching the criteria
+        conn.close()
+
+        if user:
+            session['username'] = username
+            session['user_type'] = user_type
+            session['full_name'] = user[1]
+            
+            print("DEBUG: Session values:", session)  # Debugging statement
+            
+            if user_type == "seller":
+                return redirect('/seller_dashboard')
+            else:
+                return redirect('/agent_dashboard')
+        else:
+            # Invalid login, pass an error message back to the template
+            error_message = "Either Invalid credentials or account doesn't exist. Please try again."
+            return render_template('login.html', error_message=error_message)
+
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    # Remove the user from the session (log out)
+    session.pop('username', None)
+    session.pop('user_type', None)
+    
+    # Redirect the user to the login page after logging out
+    return redirect(url_for('index'))
+
 def init_listings_db():
     conn = sqlite3.connect('listings.db')
     c = conn.cursor()
@@ -257,211 +546,6 @@ def find_similar_past_prices(flat_type, town, floor_area, remaining_lease):
     } for r in results]
 '''
 
-
-
-
-
-
-
-
-
-
-
-
-#go to http://localhost:5000/view_accounts to view
-@app.route('/view_accounts')
-def view_accounts():
-    conn = sqlite3.connect('accounts.db')
-    c = conn.cursor()
-    c.execute("SELECT * FROM users")  # Fetch all accounts
-    accounts = c.fetchall()  # Get all results
-    conn.close()
-    
-    # Display the accounts
-    return f"Accounts in database: {accounts}"
-
-# Function to check if agent ID exists in data.gov.sg API
-def check_agent_id(agent_id):
-    dataset_id = "d_07c63be0f37e6e59c07a4ddc2fd87fcb"
-    url = f"https://data.gov.sg/api/action/datastore_search?resource_id={dataset_id}"
-    
-    try:
-        response = requests.get(url)
-        data = response.json()
-        
-        if 'result' in data and 'records' in data['result']:
-            records = data['result']['records']
-            
-            for record in records:
-                if record.get('registration_no') == agent_id:
-                    return True  # Agent ID found
-    except Exception as e:
-        print("Error fetching agent data:", e)
-    
-    return False  # Agent ID not found
-
-# Twilio credentials
-account_sid = '***REMOVED***'  # Replace with your Twilio Account SID
-auth_token = '***REMOVED***'  # Replace with your Twilio Auth Token
-twilio_number = '***REMOVED***'  # Replace with your Twilio phone number
-
-def generate_otp():
-    otp = random.randint(100000, 999999)  # Generates a 6-digit OTP
-    return otp
-
-# Function to send OTP via SMS using Twilio
-def send_otp_sms(phone_number):
-    otp = generate_otp()
-    
-    # Store OTP in session
-    session['otp'] = otp
-    print("DEBUG: OTP stored in session:", session.get('otp'))  # Add this line to debug
-
-    # Create Twilio client
-    client = Client(account_sid, auth_token)
-    
-    # Send OTP SMS
-    message = client.messages.create(
-        body=f'Your OTP is {otp}',  # Message body
-        from_=twilio_number,  # Your Twilio phone number
-        to=phone_number  # The phone number to send OTP to
-    )
-    
-    return message.sid  # Optionally return SID for logging/debugging
-
-@app.route('/send_otp', methods=['POST'])
-def send_otp():
-    try:
-        # Read JSON data
-        data = request.get_json()
-        phone_number = data['phone_number'].strip()
-
-        # Check if the phone number is valid (starts with +65 for Singapore)
-        if not phone_number.startswith('+65'):
-            return jsonify({'success': False, 'message': 'Phone number must start with +65.'}), 400
-
-        # Generate OTP and store in session
-        otp = generate_otp()
-        session['otp'] = otp
-
-        # Send OTP via Twilio
-        message_sid = send_otp_sms(phone_number)  # Use the function to send OTP SMS
-
-        # Return a success response
-        return jsonify({'success': True, 'message': 'OTP sent successfully.'})
-
-    except Exception as e:
-        return jsonify({'success': False, 'message': str(e)}), 400
-
-def is_strong_password(password):
-    """Check if the password meets strength requirements."""
-    if len(password) < 8:
-        return False
-    if not re.search(r'[A-Z]', password):  # Check for uppercase letter
-        return False
-    if not re.search(r'[a-z]', password):  # Check for lowercase letter
-        return False
-    if not re.search(r'[0-9]', password):  # Check for a digit
-        return False
-    if not re.search(r'[\W_]', password):  # Check for special character
-        return False
-    return True
-
-
-@app.route('/create_account', methods=['GET', 'POST'])
-def create_account():
-    if request.method == 'POST':
-        full_name = request.form['full_name'].strip()
-        username = request.form['username'].strip()
-        password = request.form['password'].strip()
-        confirm_password = request.form['confirm-password'].strip()
-        phone_number = request.form['phone_number'].strip()
-        user_type = request.form['user-type'].strip()
-
-        # Validate password match
-        if password != confirm_password:
-            error_message = "Passwords do not match."
-            return render_template('create_account.html', error_message=error_message)
-        
-        # Validate password strength
-        if not is_strong_password(password):
-            error_message = "Password must be at least 8 characters long, contain both upper and lower case letters, a number, and a special character."
-            return render_template('create_account.html', error_message=error_message)
-
-        # Prepend +65 if not present
-        if not phone_number.startswith('+65'):
-            phone_number = '+65' + phone_number
-
-        otp = request.form.get('otp')  # Get OTP from form
-        print("DEBUG: OTP entered:", otp)  # Add this line to debug
-        
-        if otp:
-            # Ensure OTP is treated as an integer
-            otp = int(otp)  # Convert OTP from form to integer
-            
-            if 'otp' not in session or session['otp'] != otp:
-                error_message = "Invalid OTP. Please try again."
-                return render_template('create_account.html', error_message=error_message)
-            
-            del session['otp']  # Clear OTP from session after successful verification
-
-        # Initialize database connection
-        conn = sqlite3.connect('accounts.db')
-        c = conn.cursor()
-
-        # Check if username already exists
-        c.execute("SELECT * FROM users WHERE username=?", (username,))
-        if c.fetchone():
-            conn.close()
-            error_message = "Username already taken. Please choose another one."
-            return render_template('create_account.html', error_message=error_message)
-        
-        # allow duplicate phone number cuz free trial account only allows 1 number
-        # # Check if phone number already exists
-        # c.execute("SELECT * FROM users WHERE phone_number=?", (phone_number,))
-        # if c.fetchone():
-        #     conn.close()
-        #     error_message = "Phone number already in use. Please use a different number."
-        #     return render_template('create_account.html', error_message=error_message)
-
-        # Insert into the database
-        if user_type == 'seller':
-            c.execute("INSERT INTO users (full_name, username, password, phone_number, user_type) VALUES (?, ?, ?, ?, ?) ",
-                      (full_name, username, password, phone_number, user_type))
-        
-        elif user_type == 'agent':
-            agent_id = request.form.get('agent_id', '').strip()
-            
-            if not agent_id:
-                conn.close()
-                error_message = "Agent registration number is required."
-                return render_template('create_account.html', error_message=error_message)
-
-            if not check_agent_id(agent_id):
-                conn.close()
-                error_message = "Invalid agent registration number. Please enter a valid ID."
-                return render_template('create_account.html', error_message=error_message)
-
-            c.execute("INSERT INTO users (full_name, username, password, phone_number, user_type, agent_id) VALUES (?, ?, ?, ?, ?, ?) ",
-                      (full_name, username, password, phone_number, user_type, agent_id))
-        
-        else:
-            conn.close()
-            error_message = "Invalid user type selected."
-            return render_template('create_account.html', error_message=error_message)
-
-        # Commit changes and close connection
-        conn.commit()
-        conn.close()
-
-        flash("Account created successfully!", "success")
-        return redirect(url_for('login'))  # Redirect to login page after successful account creation
-
-    else:
-        # Display the account creation form with OTP field
-        phone_number = request.args.get('phone_number')
-        return render_template('create_account.html', show_otp=True, phone_number=phone_number)
-
 @app.route('/mark_as_sold', methods=['POST'])
 def mark_as_sold():
     if 'username' not in session or session.get('user_type') != 'seller':
@@ -498,102 +582,7 @@ def mark_as_sold():
     
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
-
-
-@app.route('/change_password', methods=['GET', 'POST'])
-def change_password():
-    if request.method == 'POST':
-        username = request.form['username'].strip()
-        phone_number = request.form['phone_number'].strip()
-
-        # Ensure phone number starts with +65
-        if not phone_number.startswith('+65'):
-            phone_number = '+65' + phone_number
-
-        otp = request.form.get('otp')  # OTP entered by the user
-        new_password = request.form['new_password'].strip()
-        confirm_new_password = request.form['confirm_new_password'].strip()
-
-        # Check if the OTP is correct
-        if 'otp' not in session or session['otp'] != int(otp):
-            flash("Invalid OTP. Please try again.", "error")
-            return redirect(url_for('change_password'))
-
-        # Check if the new password and confirm password match
-        if new_password != confirm_new_password:
-            flash("Passwords do not match. Please try again.", "error")
-            return redirect(url_for('change_password'))
-
-        # Validate password strength
-        if not is_strong_password(new_password):
-            flash("Password must be at least 8 characters long, contain an uppercase letter, a lowercase letter, a digit, and a special character.", "error")
-            return redirect(url_for('change_password'))
-
-        # Validate phone number (check if it matches the user in DB)
-        conn = sqlite3.connect('accounts.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? AND phone_number=?", (username, phone_number))
-        user = c.fetchone()
-        conn.close()
-
-        if not user:
-            flash("User not found or phone number mismatch.", "error")
-            return redirect(url_for('change_password'))
-
-        # Store the raw password in the database (no hashing)
-        conn = sqlite3.connect('accounts.db')
-        c = conn.cursor()
-        c.execute("UPDATE users SET password=? WHERE username=?", (new_password, username))
-        conn.commit()
-        conn.close()
-
-        flash("Password changed successfully!", "success")
-        return redirect(url_for('login'))
-
-    return render_template('change_password.html')
     
-# Login route
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        user_type = request.form['user_type']  # Get the user type from the form
-
-        # Check if the user exists in the database with the selected user_type
-        conn = sqlite3.connect('accounts.db')
-        c = conn.cursor()
-        c.execute("SELECT * FROM users WHERE username=? AND password=? AND user_type=?", 
-          (username.strip(), password.strip(), user_type.strip()))
-        user = c.fetchone()  # Fetch one row matching the criteria
-        conn.close()
-
-        if user:
-            session['username'] = username
-            session['user_type'] = user_type
-            session['full_name'] = user[1]
-            
-            print("DEBUG: Session values:", session)  # Debugging statement
-            
-            if user_type == "seller":
-                return redirect('/seller_dashboard')
-            else:
-                return redirect('/agent_dashboard')
-        else:
-            # Invalid login, pass an error message back to the template
-            error_message = "Either Invalid credentials or account doesn't exist. Please try again."
-            return render_template('login.html', error_message=error_message)
-
-    return render_template('login.html')
-
-@app.route('/logout')
-def logout():
-    # Remove the user from the session (log out)
-    session.pop('username', None)
-    session.pop('user_type', None)
-    
-    # Redirect the user to the login page after logging out
-    return redirect(url_for('index'))    
 
 @app.route("/test_prices")
 def test_prices():
