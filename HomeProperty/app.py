@@ -37,6 +37,7 @@ def init_db():
 
     conn.commit()
     conn.close()
+#init_db() #re-run this whenever u wan del existing db
 
 #go to http://localhost:5000/view_accounts to view
 @app.route('/view_accounts')
@@ -351,8 +352,6 @@ def init_listings_db():
     conn.commit()
     conn.close()
 
-init_db() #re-run this whenever u wan del existing db
-import requests
 
 # Constants
 API_URL = "https://data.gov.sg/api/action/datastore_search?resource_id=d_8b84c4ee58e3cfc0ece0d773c8ca6abc"
