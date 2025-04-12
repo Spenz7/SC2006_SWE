@@ -278,7 +278,13 @@
   </footer>
   <!-- / Footer -->
   <script>
+  
+  let fetchTriggeredManually = false;
+
     function fetchPastPrices() {
+      fetchTriggeredManually = true; 
+      sessionStorage.setItem('fetchedPrices', 'true');  // ✅ SET THE FLAG HERE
+      
       const flatType = document.getElementById("flat_type").value;
       const town = document.getElementById("town").value;
       const floorArea = document.getElementById("floor_area").value;
@@ -343,6 +349,13 @@
           console.error(err);
         });
     }
+    window.addEventListener("DOMContentLoaded", () => {
+    // Prevent re-fetch after form submission
+    if (sessionStorage.getItem('fetchedPrices')) {
+      console.log("🛑 Skipping fetch on reload");
+      sessionStorage.removeItem('fetchedPrices');  // Clean up
+    }
+  });
   </script>
 
   

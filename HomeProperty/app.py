@@ -789,7 +789,6 @@ def list_property():
         flash("Only sellers can list properties!", "danger")
         return redirect(url_for('index'))  # Redirect unauthorized users
 
-        similar_houses = []
 
     if request.method == 'POST':
         # Extract form data
@@ -815,10 +814,6 @@ def list_property():
             flash("Please enter valid numerical values.", "danger")
             return redirect(url_for('list_property'))
 
-
-        similar_houses = find_similar_past_prices(flat_type, town, floor_area, years_remaining)
-        if not similar_houses:
-            flash("⚠ No exact matches found. Showing similar listings.", "warning")
                 
         # Database connection
         conn = sqlite3.connect('listings.db')
