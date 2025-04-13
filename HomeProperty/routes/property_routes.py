@@ -93,6 +93,25 @@ def view_your_property():
         conn.close()
 
 
+@property_bp.route('/agent_profile/<username>')
+def agent_profile(username):
+    conn = sqlite3.connect('accounts.db')
+    conn.row_factory = sqlite3.Row
+    c = conn.cursor()
+
+    agent = c.execute("SELECT * FROM users WHERE username = ? AND user_type = 'agent'", (username,)).fetchone()
+    if not agent:
+        conn.close()
+        return "Agent not found", 404
+
+    reviews = c.execute('''
+        SELECT * FROM sold_properties
+        WHERE agent_username = ?
+    ''', (username,)).fetchall()
+
+    conn.close()
+    return render_template('agent_profile.html', agent=agent, reviews=reviews)
+
 # Submit a bid by agent
 @property_bp.route('/submit_bid', methods=['POST'])
 def submit_bid():
