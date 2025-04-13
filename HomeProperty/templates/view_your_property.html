@@ -51,24 +51,14 @@
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-left">
                   <div class="aa-telephone-no">
-                    <span class="fa fa-phone"></span>
-                    1-900-523-3564
+                  SC2006-SCSB-T4
                   </div>
                   <div class="aa-email hidden-xs">
-                    <span class="fa fa-envelope-o"></span> info@markups.com
                   </div>
                 </div>              
               </div>
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-right">
-                  {% if 'username' in session %}
-                    <!-- Show logout button when user is logged in -->
-                    <a href="{{ url_for('auth.logout') }}" class="aa-logout">Logout</a>
-                  {% else %}
-                    <!-- Show login and register when user is NOT logged in -->
-                    <a href="{{ url_for('auth.create_account') }}" class="aa-register">Register</a>
-                    <a href="{{ url_for('auth.login') }}" class="aa-login">Login</a>
-                  {% endif %}
                 </div>
               </div>
             </div>
@@ -93,16 +83,13 @@
         
         <!-- LOGO -->                                               
         <!-- Text based logo -->
-        <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
+        <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
         <!-- Image based logo -->
-        <!--<a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> -->
+        <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
             <li><a href="/">HOME</a></li>
-            
-          
-
             {% if 'username' in session %}
                 {% if session['user_type'] == 'seller' %}
                     <!-- Seller-specific menu -->
@@ -143,10 +130,10 @@
         <div class="col-md-12">
           <div class="aa-property-header-inner">
             <h2>Your Properties</h2>
-            <ol class="breadcrumb">
+<!--             <ol class="breadcrumb">
             <li><a href="#">HOME</a></li>            
             <li class="active">PROPERTIES</li>
-          </ol>
+          </ol> -->
           </div>
         </div>
       </div>
@@ -368,134 +355,7 @@
   <script src="{{ url_for('static', filename='js/logout.js') }}"></script>
   <script src="{{ url_for('static', filename='js/viewyourpropertymodal.js') }}"></script>
   <script>
-    console.log("🧠 JS script loaded!");
-  </script>
-  <script>
-   /* document.addEventListener('DOMContentLoaded', function () {
-      console.log("✅ JS script loaded!");
-  
-      window.loadPropertyDetails = function (propertyId) {
-        console.log("🚀 loadPropertyDetails triggered for property ID:", propertyId);
-  
-        fetch(`/get_property_details/${propertyId}`)
-          .then(response => response.json())
-          .then(data => {
-            const property = data.property;
-            const bidders = data.bidders;
-  
-            console.log("📦 Property:", property);
-            console.log("👥 Bidders:", bidders);
-  
-            // Fill in modal details
-            $('#modal-flat-type').text(property.flat_type);
-            $('#modal-town').text(property.town);
-            $('#modal-street-name').text(property.street_name);
-            $('#modal-floor-area').text(property.floor_area);
-            $('#modal-max-com-bid').text(property.max_com_bid);
-            $('#modal-years-remaining').text(property.years_remaining);
-            $('#modal-listing-price').text(property.listing_price);
-  
-            // Clear bidder list
-            const $bidderList = $('#bidder-list');
-            $bidderList.empty();
-  
-            if (Array.isArray(bidders) && bidders.length > 0) {
-              bidders.sort((a, b) => a.bid_percent - b.bid_percent);
-
-              bidders.forEach(bid => {
-                console.log("🧪 Bidder raw data:", bid);
-
-                const username = bid.agent_username;
-                const percent = bid.bid_percent;
-
-                if (!username || percent === undefined || percent === null) {
-                  console.warn("⚠️ Skipping invalid bid:", bid);
-                  return;
-                }
-
-                $bidderList.append(`
-                  <tr>
-                    <td>${username}</td>
-                    <td>${percent.toFixed(1)}%</td>
-                    <td>
-                      <button class="btn btn-success btn-sm" onclick="acceptBid(${property.id}, '${username}')">
-                        Accept
-                      </button>
-                      <button class="btn btn-primary btn-sm ml-2" onclick="viewAgentProfile('${username}')">
-                        View Profile
-                      </button>
-                    </td>
-
-                  </tr>
-                `);
-              });
-            } else {
-              $bidderList.append(`<tr><td colspan="3" class="text-center">No bids yet</td></tr>`);
-            }
-  
-            $('#propertyModal').modal('show');
-          })
-          .catch(error => console.error("❌ Error fetching property details:", error));
-      };
-  
-      window.acceptBid = function (propertyId, agentUsername) {
-        fetch('/accept_bid', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            property_id: propertyId,
-            agent_username: agentUsername
-          })
-        })
-        .then(res => res.json())
-        .then(response => {
-          alert(response.message);
-          location.reload();
-        })
-        .catch(err => console.error("❌ Error accepting bid:", err));
-      };
-
-
-    function viewAgentProfile(username) {
-      fetch(`/agent_profile/${username}`)
-        .then(response => response.text())
-        .then(html => {
-          // Create a new window or modal for the profile
-          const newWindow = window.open("", "_blank");
-          newWindow.document.write(html);
-        })
-        .catch(error => console.error("❌ Failed to load profile:", error));
-    }
-    
-  window.submitMarkAsSold = function () {
-    const propertyId = window.selectedPropertyId;
-    const agentUsername = window.selectedAgent;
-    const rating = parseInt(document.getElementById('review-rating').value);
-    const review = document.getElementById('review-text').value;
-
-    if (!rating || rating < 1 || rating > 5) {
-      alert("Please enter a valid rating between 1 and 5.");
-      return;
-    }
-
-    fetch('/mark_as_sold', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        property_id: propertyId,
-        agent_username: agentUsername,
-        rating: rating,
-        review: review
-      })
-    })
-      .then(res => res.json())
-      .then(response => {
-        alert(response.message);
-        location.reload();
-      })
-      .catch(err => console.error("❌ Error submitting review:", err));
-  }; */
-
+    console.log("JS script loaded!");
   </script>
   
   <script>

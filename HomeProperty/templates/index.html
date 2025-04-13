@@ -47,11 +47,9 @@
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-left">
                   <div class="aa-telephone-no">
-                    <span class="fa fa-phone"></span>
-                    1-900-523-3564
+                  SC2006-SCSB-T4
                   </div>
-                  
-                </div>              
+                </div>         
               </div>
               <div class="col-md-6 col-sm-6 col-xs-6">
               <!-- <div class="aa-header-right">
@@ -89,7 +87,9 @@
         
         <!-- LOGO -->                                               
         <!-- Text based logo -->
-        <a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a>
+        <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
+        <!-- Image based logo -->
+        <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
@@ -291,7 +291,7 @@
         <div class="aa-title">
           <h2>Latest Properties</h2>
           <span></span>
-          <p>Explore recently listed and sold properties.</p>         
+          <p style="color: black;">Explore recently listed and sold properties.</p>         
         </div>
   
         <div class="aa-latest-properties-content">
