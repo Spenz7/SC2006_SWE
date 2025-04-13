@@ -257,7 +257,7 @@ def accept_bid():
     conn.commit()
     conn.close()
 
-    return jsonify({'success': True, 'message': f"Bid by {accepted_agent} accepted. Listing marked as sold."})
+    return jsonify({'success': True, 'message': f"Bid by {accepted_agent} accepted. Listing marked as sold.",'redirect': '/view_your_property'})
 
 
 # Mark a property as sold with review

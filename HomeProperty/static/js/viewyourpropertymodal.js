@@ -40,21 +40,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
               }
 
-              $bidderList.append(`
-                <tr>
-                  <td>${username}</td>
-                  <td>${percent.toFixed(1)}%</td>
-                  <td>
-                    <button class="btn btn-success btn-sm" onclick="acceptBid(${property.id}, '${username}')">
-                      Accept
-                    </button>
-                    <button class="btn btn-primary btn-sm ml-2" onclick="viewAgentProfile('${username}')">
-                      View Profile
-                    </button>
-                  </td>
+              let actionHTML = `
+  <button class="btn btn-primary btn-sm ml-2" onclick="viewAgentProfile('${username}')">
+    View Profile
+  </button>
+`;
 
-                </tr>
-              `);
+if (property.status === 'C') {
+  if (username === bidders[0].agent_username) {
+    actionHTML = `<span class="badge badge-success">Accepted </span> ` + actionHTML;
+  }
+} else {
+  actionHTML = `
+    <button class="btn btn-success btn-sm" onclick="acceptBid(${property.id}, '${username}')">
+      Accept
+    </button>
+    ` + actionHTML;
+}
+
+$bidderList.append(`
+  <tr>
+    <td>${username}</td>
+    <td>${percent.toFixed(1)}%</td>
+    <td>${actionHTML}</td>
+  </tr>
+`);
+
             });
           } else {
             $bidderList.append(`<tr><td colspan="3" class="text-center">No bids yet</td></tr>`);
@@ -76,7 +87,12 @@ document.addEventListener('DOMContentLoaded', function () {
       })
         .then(res => res.json())
         .then(response => {
-          alert(response.message);
+          if (response.message) {
+            alert(response.message);  // this blocks until the user clicks OK
+          }
+          if (response.redirect) {
+            window.location.href = response.redirect;
+          }
 
           // ✅ Save selected data for marking sold
           window.selectedPropertyId = propertyId;
@@ -86,6 +102,8 @@ document.addEventListener('DOMContentLoaded', function () {
           document.getElementById('review-rating').value = '';
           document.getElementById('review-text').value = '';
           document.getElementById('review-section').style.display = 'block';
+          
+          
         })
 
         .catch(err => console.error("❌ Error accepting bid:", err));
