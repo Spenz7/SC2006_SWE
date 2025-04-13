@@ -80,49 +80,100 @@ def generate_otp():
     otp = random.randint(100000, 999999)  # Generates a 6-digit OTP
     return otp
 
-# Function to send OTP via SMS using Twilio
-def send_otp_sms(phone_number):
-    otp = generate_otp()
+#Without strat pattern
+# # Function to send OTP via SMS using Twilio
+# def send_otp_sms(phone_number):
+#     otp = generate_otp()
     
-    # Store OTP in session
-    session['otp'] = otp
-    print("DEBUG: OTP stored in session:", session.get('otp'))  # Add this line to debug
+#     # Store OTP in session
+#     session['otp'] = otp
+#     print("DEBUG: OTP stored in session:", session.get('otp'))  # Add this line to debug
 
-    # Create Twilio client
-    client = Client(account_sid, auth_token)
+#     # Create Twilio client
+#     client = Client(account_sid, auth_token)
     
-    # Send OTP SMS
-    message = client.messages.create(
-        body=f'Your OTP is {otp}',  # Message body
-        from_=twilio_number,  # Your Twilio phone number
-        to=phone_number  # The phone number to send OTP to
-    )
+#     # Send OTP SMS
+#     message = client.messages.create(
+#         body=f'Your OTP is {otp}',  # Message body
+#         from_=twilio_number,  # Your Twilio phone number
+#         to=phone_number  # The phone number to send OTP to
+#     )
     
-    return message.sid  # Optionally return SID for logging/debugging
+#     return message.sid  # Optionally return SID for logging/debugging
+
+def send_otp_sms(phone_number, strategy):
+    otp = generate_otp()
+    session['otp'] = otp
+    print("DEBUG: OTP stored in session:", session.get('otp'))
+    message_sid = strategy.send(phone_number, otp)
+    return message_sid
+
+class OTPStrategy:
+    def send(self, phone_number, otp):
+        raise NotImplementedError
+
+class TwilioOTPStrategy(OTPStrategy):
+    def __init__(self, sid, token, twilio_number):
+        self.client = Client(sid, token)
+        self.twilio_number = twilio_number
+
+    def send(self, phone_number, otp):
+        message = self.client.messages.create(
+            body=f'Your OTP is {otp}',
+            from_=self.twilio_number,
+            to=phone_number
+        )
+        return message.sid
+
+class MockOTPStrategy(OTPStrategy):
+    def send(self, phone_number, otp):
+        print(f"[MOCK] Your OTP is {otp} sent to {phone_number}")
+        return "mocked_sid"
 
 @app.route('/send_otp', methods=['POST'])
 def send_otp():
     try:
-        # Read JSON data
         data = request.get_json()
         phone_number = data['phone_number'].strip()
 
-        # Check if the phone number is valid (starts with +65 for Singapore)
         if not phone_number.startswith('+65'):
             return jsonify({'success': False, 'message': 'Phone number must start with +65.'}), 400
 
-        # Generate OTP and store in session
-        otp = generate_otp()
-        session['otp'] = otp
+        # Choose which strategy to use
+        strategy = TwilioOTPStrategy(account_sid, auth_token, twilio_number)
+        # strategy = MockOTPStrategy()  # Uncomment for testing without sending real SMS
 
-        # Send OTP via Twilio
-        message_sid = send_otp_sms(phone_number)  # Use the function to send OTP SMS
+        message_sid = send_otp_sms(phone_number, strategy)
 
-        # Return a success response
         return jsonify({'success': True, 'message': 'OTP sent successfully.'})
 
     except Exception as e:
         return jsonify({'success': False, 'message': str(e)}), 400
+
+# without strat pattern
+# @app.route('/send_otp', methods=['POST'])
+# def send_otp():
+#     try:
+#         # Read JSON data
+#         data = request.get_json()
+#         phone_number = data['phone_number'].strip()
+
+#         # Check if the phone number is valid (starts with +65 for Singapore)
+#         if not phone_number.startswith('+65'):
+#             return jsonify({'success': False, 'message': 'Phone number must start with +65.'}), 400
+
+#         # Generate OTP and store in session
+#         otp = generate_otp()
+#         session['otp'] = otp
+
+#         # Send OTP via Twilio
+#         message_sid = send_otp_sms(phone_number)  # Use the function to send OTP SMS
+
+#         # Return a success response
+#         return jsonify({'success': True, 'message': 'OTP sent successfully.'})
+
+#     except Exception as e:
+#         return jsonify({'success': False, 'message': str(e)}), 400
 
 def is_strong_password(password):
     """Check if the password meets strength requirements."""
