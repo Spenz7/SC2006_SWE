@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 import sqlite3
 import json
-from services.resale_price_service import ResalePriceService
+from services.resale_price_service import find_similar_past_prices  # ✅ updated import
 
 api_bp = Blueprint('api', __name__)
 
@@ -14,12 +14,12 @@ def get_similar_prices():
         floor_area = float(request.args.get('floor_area'))
         years_remaining = float(request.args.get('years_remaining'))
 
-        service = ResalePriceService(flat_type, town, floor_area, years_remaining)
-        results = service.get_recent_similar_sales()
+        # ✅ Call the function directly (no service instance)
+        results = find_similar_past_prices(flat_type, town, floor_area, years_remaining)
 
         print("🔁 FINAL 5 RESULTS TO RETURN:")
-        for i, record in enumerate(results, 1):
-            print(f"{i}. {record}")
+        for i, r in enumerate(results, start=1):
+            print(f"{i}. {r}")
 
         return jsonify(results)
 
