@@ -59,11 +59,11 @@
                <div class="aa-header-right">
                   {% if 'username' in session %}
                     <!-- Show logout button when user is logged in -->
-                    <a href="/logout" class="aa-logout">Logout</a>
+                    <a href="/auth.logout" class="aa-logout">Logout</a>
                   {% else %}
                     <!-- Show login and register when user is NOT logged in -->
-                    <a href="{{ url_for('create_account') }}" class="aa-register">Register</a>
-                    <a href="{{ url_for('login') }}" class="aa-login">Login</a>
+                    <a href="{{ url_for('auth.create_account') }}" class="aa-register">Register</a>
+                    <a href="{{ url_for('auth.login') }}" class="aa-login">Login</a>
                   {% endif %}
                 </div> 
               </div>
