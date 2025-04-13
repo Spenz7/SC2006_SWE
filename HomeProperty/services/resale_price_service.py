@@ -59,46 +59,44 @@ def filter_and_sort_records(records, flat_type, town, min_area=None, max_area=No
 
 
 def find_similar_past_prices(flat_type, town, floor_area, remaining_lease, max_time=60):
-    all_records = []
+    matched_records = []
     start_time = time.time()
+    offset = 0
 
     print(f"🔍 Starting to fetch records for flat_type: {flat_type}, town: {town}, floor_area: {floor_area}, remaining_lease: {remaining_lease}")
 
-    records, total_records = fetch_resale_data_from_api(flat_type, town, offset=0)
-
-    if total_records == 0:
-        print("❌ No records found")
-        return []
-
-    total_pages = total_records // PAGE_SIZE + (1 if total_records % PAGE_SIZE else 0)
-    print(f"Total pages: {total_pages}, total records: {total_records}")
-
-    offset = total_records - PAGE_SIZE
-    while offset >= 0:
+    while True:
         elapsed_time = time.time() - start_time
         if elapsed_time > max_time:
-            print(f"⏱️ Time limit of {max_time} seconds reached. Returning fetched records.")
+            print(f"⏱️ Time limit of {max_time} seconds reached.")
             break
 
-        print(f"Fetching records at offset: {offset}, elapsed: {elapsed_time:.2f}s")
-        records, _ = fetch_resale_data_from_api(flat_type=flat_type, town=town, offset=offset)
+        print(f"🔄 Fetching at offset: {offset}, elapsed time: {elapsed_time:.2f}s")
+        records, total_records = fetch_resale_data_from_api(flat_type, town, offset=offset)
 
         if not records:
-            print("❌ No records at this offset. Stopping.")
+            print("❌ No more records available.")
             break
 
-        all_records.extend(records)
-        offset -= PAGE_SIZE
+        filtered_batch = filter_and_sort_records(
+            records,
+            flat_type,
+            town,
+            min_area=int(floor_area) - 10,
+            max_area=int(floor_area) + 10,
+            min_lease=int(remaining_lease) - 5,
+            max_lease=int(remaining_lease) + 5
+        )
 
-    filtered_records = filter_and_sort_records(
-        all_records,
-        flat_type,
-        town,
-        min_area=int(floor_area) - 10,
-        max_area=int(floor_area) + 10,
-        min_lease=int(remaining_lease) - 5,
-        max_lease=int(remaining_lease) + 5
-    )
+        matched_records.extend(filtered_batch)
 
-    print(f"✅ Filtered and sorted records count: {len(filtered_records)}")
-    return filtered_records[:5]
+        if len(matched_records) >= 5:
+            print("✅ Found at least 5 matching records. Returning early.")
+            return matched_records[:5]
+
+        offset += PAGE_SIZE
+        if offset >= total_records:
+            break
+
+    print(f"✅ Total matches found after full scan: {len(matched_records)}")
+    return matched_records[:5]
