@@ -48,7 +48,7 @@ def list_property():
         conn.close()
 
         flash("Property listed successfully!", "success")
-        return redirect(url_for('dashboard.seller_dashboard'))
+        return redirect(url_for('property.view_your_property'))
 
     return render_template('list-property.html')
 
