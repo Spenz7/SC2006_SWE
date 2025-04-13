@@ -74,11 +74,11 @@
           <!-- Text based logo -->
           <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
           <!-- Image based logo -->
-          <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
+          <a class="navbar-brand aa-logo-img" href="/seller_dashboard"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
         </div>
         <div id="navbar" class="navbar-collapse collapse">
           <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
-              <li><a href="/">HOME</a></li>
+              <li><a href="/seller_dashboard">HOME</a></li>
               {% if 'username' in session %}
                   {% if session['user_type'] == 'seller' %}
                       <!-- Seller-specific menu -->

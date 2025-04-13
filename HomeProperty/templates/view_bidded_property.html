@@ -126,11 +126,11 @@
       <div class="navbar-header">
         <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
           <!-- Image based logo -->
-          <a class="navbar-brand aa-logo-img" href="/"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
+          <a class="navbar-brand aa-logo-img" href="/agent_dashboard"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
       </div>
       <div id="navbar" class="navbar-collapse collapse">
         <ul class="nav navbar-nav navbar-right aa-main-nav">
-          <li><a href="/">HOME</a></li>
+          <li><a href="/agent_dashboard">HOME</a></li>
           {% if 'username' in session %}
             {% if session['user_type'] == 'seller' %}
               <li><a href="/list-property">List Property</a></li>
