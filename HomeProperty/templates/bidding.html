@@ -228,7 +228,7 @@
           {% for property in listings if property['status'] == 'A' %}
 
             <div class="property-card">
-              <img src="{{ url_for('static', filename='img/item1.jpg') }}" alt="Property Image">
+              <img src="{{ url_for('static', filename='img/house3.jpg') }}" alt="Property Image">
               <h4>{{ property['flat_type'] }} in {{ property['town'] }}</h4>
               <p>{{ property['floor_area'] }} SQ FT | ${{ property['listing_price'] }}</p>
               <p>Max Commission: {{ property['max_com_bid'] }}%</p>

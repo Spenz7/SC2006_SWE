@@ -167,9 +167,9 @@
       <div class="row">
         {% for listing in listings %}
         <div class="col-md-4 mb-4 property-card status-{{ listing['status'] }}">
-
+          
             <div class="card">
-              <img src="{{ url_for('static', filename='img/item/1.jpg') }}" class="card-img-top" alt="Property Image">
+              <img src="static/img/house3.jpg" class="card-img-top" alt="Property Image">
               <div class="card-body">
                 <h5 class="card-title">{{ listing['flat_type'] }} in {{ listing['town'] }}</h5>
                 <p class="card-text">
