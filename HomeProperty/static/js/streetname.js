@@ -1,10 +1,11 @@
-// To populate List-Property Town and Street name from DATA.GOV API
 document.addEventListener("DOMContentLoaded", function () {
     const datasetId = "d_8b84c4ee58e3cfc0ece0d773c8ca6abc"; 
     const url = `https://data.gov.sg/api/action/datastore_search?resource_id=${datasetId}&limit=10000`;
 
     const townDropdown = document.getElementById("town");
     const streetDropdown = document.getElementById("street_name");
+
+    let streetToTownMap = {};  // Will map street_name -> town
 
     fetch(url)
         .then(response => response.json())
@@ -13,15 +14,32 @@ document.addEventListener("DOMContentLoaded", function () {
             const townNames = new Set();
             const streetNames = new Set();
 
-            // Extract unique values
+            // Extract and build mappings
             records.forEach(record => {
-                if (record.town) townNames.add(record.town.trim().toUpperCase());
-                if (record.street_name) streetNames.add(record.street_name.trim().toUpperCase());
+                const town = record.town?.trim().toUpperCase();
+                const street = record.street_name?.trim().toUpperCase();
+
+                if (town && street) {
+                    townNames.add(town);
+                    streetNames.add(street);
+
+                    // If a street maps to multiple towns, only keep the first or last
+                    streetToTownMap[street] = town;
+                }
             });
 
-            // Populate dropdowns independently
+            // Populate both dropdowns
             populateDropdown(townDropdown, [...townNames].sort());
             populateDropdown(streetDropdown, [...streetNames].sort());
+
+            // Add event listener for street selection
+            streetDropdown.addEventListener("change", function () {
+                const selectedStreet = this.value;
+                const mappedTown = streetToTownMap[selectedStreet];
+                if (mappedTown) {
+                    townDropdown.value = mappedTown;
+                }
+            });
         })
         .catch(error => console.error("Error fetching data:", error));
 });
