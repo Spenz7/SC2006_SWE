@@ -51,8 +51,7 @@
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-left">
                   <div class="aa-telephone-no">
-                    <span class="fa fa-phone"></span>
-                    1-900-523-3564
+                    2006-SCSB-T4
                   </div>
                   <div class="aa-email hidden-xs">
                     <span class="fa fa-envelope-o"></span> info@markups.com
@@ -61,14 +60,7 @@
               </div>
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-right">
-                  {% if 'username' in session %}
-                    <!-- Show logout button when user is logged in -->
-                    <a href="{{ url_for('logout') }}" class="aa-logout">Logout</a>
-                  {% else %}
-                    <!-- Show login and register when user is NOT logged in -->
-                    <a href="{{ url_for('create_account') }}" class="aa-register">Register</a>
-                    <a href="{{ url_for('login') }}" class="aa-login">Login</a>
-                  {% endif %}
+
                 </div>
               </div>
             </div>
