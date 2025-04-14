@@ -77,6 +77,28 @@ def view_your_property():
             ORDER BY id DESC
             LIMIT ? OFFSET ?
         """, (username, per_page, offset)).fetchall()
+        
+        # Add review check for each property
+        conn2 = sqlite3.connect('accounts.db')
+        conn2.row_factory = sqlite3.Row
+        c2 = conn2.cursor()
+
+        for i, listing in enumerate(properties):
+            listing_dict = dict(listing)
+            bidders = json.loads(listing_dict.get('bidders', '[]'))
+            accepted_agent = bidders[-1][0] if bidders else None
+
+            review_exists = c2.execute('''
+                SELECT 1 FROM sold_properties
+                WHERE property_id = ? AND seller_username = ? AND agent_username = ?
+            ''', (listing['id'], username, accepted_agent)).fetchone()
+
+            # Update the listing to include has_review flag
+            properties[i] = dict(listing)  # make mutable
+            properties[i]['has_review'] = bool(review_exists)
+
+        conn2.close()
+
 
         total_pages = (total_properties + per_page - 1) // per_page  # Ceiling division
 
@@ -295,8 +317,8 @@ def mark_as_sold():
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
     
-
-# Update listing details (price, max commission, years remaining)
+    
+    
 @property_bp.route('/update_listing', methods=['POST'])
 def update_listing():
     if 'username' not in session or session.get('user_type') != 'seller':
