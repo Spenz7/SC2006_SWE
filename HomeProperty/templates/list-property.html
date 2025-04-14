@@ -324,10 +324,12 @@
             display.style.color = "green";
             table.style.display = "table";
           } else {
-            display.textContent = "No matching resale prices found.";
-            display.style.color = "red";
+            display.textContent = "😕 No close matches found just yet.\nTry adjusting the floor area or lease duration to see more results.";
+            display.style.color = "#555";  // softer color for a pleasant feel
+            display.style.fontStyle = "italic";
+            display.style.whiteSpace = "pre-line";  // allows line break in text
             table.style.display = "none";
-          }
+        }
         })
         .catch(err => {
           document.getElementById("past-price-display").textContent = "Error fetching data.";
