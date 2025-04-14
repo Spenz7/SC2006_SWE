@@ -27,3 +27,7 @@ def validate_otp(session_otp, input_otp):
         return session_otp == int(input_otp)
     except:
         return False
+
+def is_valid_sg_number(phone):
+    """Checks for a valid Singapore number, excluding country code."""
+    return re.fullmatch(r'[689]\d{7}', phone) is not None
