@@ -230,7 +230,7 @@ function confirmDeleteListing() {
   })
     .then(res => res.json())
     .then(data => {
-      alert(data.message);
+      //alert(data.message);
       $('#editBiddingsModal').modal('hide');
       location.reload();
     })
