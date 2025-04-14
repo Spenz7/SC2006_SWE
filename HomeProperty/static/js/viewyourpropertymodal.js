@@ -149,3 +149,93 @@ window.submitMarkAsSold = function () {
     })
     .catch(err => console.error("❌ Error submitting review:", err));
 };
+
+function openEditBiddingsModal(propertyId) {
+  // Fetch current listing data
+  fetch(`/get_property_details/${propertyId}`)
+    .then(res => res.json())
+    .then(data => {
+      const property = data.property;
+      document.getElementById("edit-property-id").value = property.id;
+      document.getElementById("edit-price").value = property.listing_price;
+      document.getElementById("edit-max-commission").value = property.max_com_bid;
+      document.getElementById("edit-years-remaining").value = property.years_remaining;
+
+      $('#editBiddingsModal').modal('show');
+    })
+    .catch(err => {
+      console.error("Failed to load property details:", err);
+      alert("Failed to load listing data.");
+    });
+}
+
+function submitEditBiddings() {
+  const price = parseFloat(document.getElementById("edit-price").value);
+  const commission = parseFloat(document.getElementById("edit-max-commission").value);
+  const yearsRemaining = parseInt(document.getElementById("edit-years-remaining").value);
+
+  // Validate commission range
+  if (commission < 1 || commission > 5 || isNaN(commission)) {
+    document.getElementById("edit-max-commission-error").style.display = "block";
+    return;
+  } else {
+    document.getElementById("edit-max-commission-error").style.display = "none";
+  }
+
+  const payload = {
+    property_id: document.getElementById("edit-property-id").value,
+    listing_price: price,
+    max_com_bid: commission,
+    years_remaining: yearsRemaining
+  };
+
+  fetch('/update_listing', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(res => res.json())
+    .then(data => {
+      //alert(data.message);
+      $('#editBiddingsModal').modal('hide');
+      location.reload();
+    })
+    .catch(err => {
+      console.error("Failed to submit edit:", err);
+      alert("Something went wrong.");
+    });
+}
+
+function enforceOneDecimal(input) {
+  const value = input.value;
+
+  // Match numbers with at most one digit after decimal
+  const regex = /^\d+(\.\d{0,1})?$/;
+
+  if (!regex.test(value)) {
+    // Remove extra digits beyond 1 decimal place
+    input.value = value.slice(0, -1);
+  }
+}
+
+function confirmDeleteListing() {
+  if (!confirm("Are you sure you want to delete this listing? This action cannot be undone.")) {
+    return;
+  }
+
+  const propertyId = document.getElementById("edit-property-id").value;
+
+  fetch(`/delete_listing/${propertyId}`, {
+    method: 'DELETE'
+  })
+    .then(res => res.json())
+    .then(data => {
+      alert(data.message);
+      $('#editBiddingsModal').modal('hide');
+      location.reload();
+    })
+    .catch(err => {
+      console.error("Failed to delete listing:", err);
+      alert("An error occurred while deleting the listing.");
+    });
+}

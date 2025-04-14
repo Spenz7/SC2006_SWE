@@ -1,48 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">    
-    <title>Home Property | Properties</title>
 
-    <!-- Favicon -->
-    <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
-    
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nouislider.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-color/default-theme.css') }}"> 
-   
-    <!-- Google Font -->
-    <link href='https://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>    
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-    
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Property | Properties</title>
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
+  <!-- Favicon -->
+  <link rel="shortcut icon" href="img/favicon.ico" type="image/x-icon">
+
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/nouislider.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-color/default-theme.css') }}">
+
+  <!-- Google Font -->
+  <link href='https://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  
 
-  </head>
-  <body class="aa-price-range">   
+
+</head>
+
+<body class="aa-price-range">
   <!-- Pre Loader -->
   <div id="aa-preloader-area">
     <div class="pulse"></div>
   </div>
   <!-- SCROLL TOP BUTTON -->
-    <a class="scrollToTop" href="#"><i class="fa fa-angle-double-up"></i></a>
+  <a class="scrollToTop" href="#"><i class="fa fa-angle-double-up"></i></a>
   <!-- END SCROLL TOP BUTTON -->
 
 
   <!-- Start header section -->
-  <header id="aa-header">  
+  <header id="aa-header">
     <div class="container">
       <div class="row">
         <div class="col-md-12">
@@ -51,11 +53,11 @@
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-left">
                   <div class="aa-telephone-no">
-                  SC2006-SCSB-T4
+                    SC2006-SCSB-T4
                   </div>
                   <div class="aa-email hidden-xs">
                   </div>
-                </div>              
+                </div>
               </div>
               <div class="col-md-6 col-sm-6 col-xs-6">
                 <div class="aa-header-right">
@@ -68,59 +70,62 @@
     </div>
   </header>
   <!-- End header section -->
-<!-- Start menu section -->
-<section id="aa-menu-area">
-  <nav class="navbar navbar-default main-navbar" role="navigation">  
-    <div class="container">
-      <div class="navbar-header">
-        <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
-        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        
-        <!-- LOGO -->                                               
-        <!-- Text based logo -->
-        <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
-        <!-- Image based logo -->
-        <a class="navbar-brand aa-logo-img" href="/seller_dashboard"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
-      </div>
-      <div id="navbar" class="navbar-collapse collapse">
-        <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
+  <!-- Start menu section -->
+  <section id="aa-menu-area">
+    <nav class="navbar navbar-default main-navbar" role="navigation">
+      <div class="container">
+        <div class="navbar-header">
+          <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+            aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+
+          <!-- LOGO -->
+          <!-- Text based logo -->
+          <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
+          <!-- Image based logo -->
+          <a class="navbar-brand aa-logo-img" href="/seller_dashboard"><img
+              src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a>
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
             <li><a href="/seller_dashboard">HOME</a></li>
             {% if 'username' in session %}
-                {% if session['user_type'] == 'seller' %}
-                    <!-- Seller-specific menu -->
-                    <li><a href="/list-property">List Property</a></li>
-                    <li class="active"><a href="/view_your_property">Your Property</a></li>
-                
-                {% elif session['user_type'] == 'agent' %}
-                    <!-- Agent-specific menu -->
-                    <li><a href="/view_listed_property">View Listed Property</a></li>
-                    <li><a href="/view_bidded_property">View Bidded Property</a></li>
-                {% endif %}
-                
-                <li><a href="/logout" class="aa-logout">Logout</a></li>
-            {% else %}
-                <li><a href="/gallery">GALLERY</a></li>                                         
-                <li class="dropdown">
-                    <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('blog_archive') }}">BLOG <span class="caret"></span></a>
-                    <ul class="dropdown-menu" role="menu">                
-                        <li><a href="/blog-archive">BLOG</a></li>
-                        <li><a href="/blog-single">BLOG DETAILS</a></li>                                            
-                    </ul>
-                </li>
-                <li><a href="/contact">CONTACT</a></li>
-                <li><a href="/create_account" class="aa-register">Register</a></li>
-                <li><a href="/login" class="aa-login">Login</a></li>
+            {% if session['user_type'] == 'seller' %}
+            <!-- Seller-specific menu -->
+            <li><a href="/list-property">List Property</a></li>
+            <li class="active"><a href="/view_your_property">Your Property</a></li>
+
+            {% elif session['user_type'] == 'agent' %}
+            <!-- Agent-specific menu -->
+            <li><a href="/view_listed_property">View Listed Property</a></li>
+            <li><a href="/view_bidded_property">View Bidded Property</a></li>
             {% endif %}
-        </ul>
-      </div>
-  </nav> 
-</section>
-<!-- End menu section -->
+
+            <li><a href="/logout" class="aa-logout">Logout</a></li>
+            {% else %}
+            <li><a href="/gallery">GALLERY</a></li>
+            <li class="dropdown">
+              <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('blog_archive') }}">BLOG <span
+                  class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="/blog-archive">BLOG</a></li>
+                <li><a href="/blog-single">BLOG DETAILS</a></li>
+              </ul>
+            </li>
+            <li><a href="/contact">CONTACT</a></li>
+            <li><a href="/create_account" class="aa-register">Register</a></li>
+            <li><a href="/login" class="aa-login">Login</a></li>
+            {% endif %}
+          </ul>
+        </div>
+    </nav>
+  </section>
+  <!-- End menu section -->
 
   <!-- Start Proerty header  -->
 
@@ -130,7 +135,7 @@
         <div class="col-md-12">
           <div class="aa-property-header-inner">
             <h2>Your Properties</h2>
-<!--             <ol class="breadcrumb">
+            <!--             <ol class="breadcrumb">
             <li><a href="#">HOME</a></li>            
             <li class="active">PROPERTIES</li>
           </ol> -->
@@ -138,7 +143,7 @@
         </div>
       </div>
     </div>
-  </section> 
+  </section>
   <!-- End Proerty header  -->
 
   <!-- Start Properties  -->
@@ -151,87 +156,95 @@
             <div class="aa-properties-content-body">
               <ul class="aa-properties-nav">
                 {% if properties %}
-                    {% for property in properties %}
-                        <li>
-                            <article class="aa-properties-item">
-                                <a class="aa-properties-item-img" href="#">
-                                    <img alt="img" src="{{ url_for('static', filename='img/house3.jpg') }}">
-                                </a>
-                                <div class="aa-properties-item-content">
-                                  <div class="aa-properties-info">
-                                    <h4 style="margin-top: 0;">
-                                      {% if property['flat_type'] in ['4 ROOM', '5 ROOM', 'MULTI-GENERATION'] %}
-                                        {{ property['flat_type'] }} Flat in {{ property['town'] }}
-                                      {% elif property['flat_type'] == 'EXECUTIVE' %}
-                                        EXECUTIVE Apartment in {{ property['town'] }}
-                                      {% else %}
-                                        {{ property['flat_type'] }} in {{ property['town'] }}
-                                      {% endif %}
-                                    </h4>
-                                    <p>{{ property['floor_area'] }} SQ FT | {{ property['years_remaining'] }} Years Remaining</p>
-                                  </div>
-                                    <div class="aa-properties-detial">
-                                      <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap;">
-                                    
-                                        <!-- Price on the left -->
-                                        <span class="aa-price" style="flex: 1;">
-                                          Listed for: ${{ "{:,.1f}".format(property['listing_price']) }}
-                                        </span>
-                                    
-                                        <!-- Review Agent centered -->
-                                        {% if property['status'] == 'C' %}
-                                          <div style="flex: 1; text-align: center;">
-                                            <a class="btn btn-success" onclick="openReviewAgentModal({{ property['id'] }})">
-                                              Review Agent
-                                            </a>
-                                          </div>
-                                        {% endif %}
-                                    
-                                        <!-- More Details on the right -->
-                                        <div style="flex: 1; text-align: right;">
-                                          <a class="aa-secondary-btn" onclick="loadPropertyDetails({{ property['id'] }})">
-                                            View Biddings
-                                          </a>
-                                        </div>
-                                    
-                                      </div>
-                                    </div>                                                                   
-                            </article>
-                        </li>
-                    {% endfor %}
+                {% for property in properties %}
+                <li>
+                  <article class="aa-properties-item">
+                    <a class="aa-properties-item-img" href="#">
+                      <img alt="img" src="{{ url_for('static', filename='img/house3.jpg') }}">
+                    </a>
+                    <div class="aa-properties-item-content">
+                      <div class="aa-properties-info">
+                        <h4 style="margin-top: 0;">
+                          {% if property['flat_type'] in ['4 ROOM', '5 ROOM', 'MULTI-GENERATION', '3 ROOM', '2 ROOM', '1
+                          ROOM'] %}
+                          {{ property['flat_type'] }} Flat in {{ property['town'] }}
+                          {% elif property['flat_type'] == 'EXECUTIVE' %}
+                          EXECUTIVE Apartment in {{ property['town'] }}
+                          {% else %}
+                          {{ property['flat_type'] }} in {{ property['town'] }}
+                          {% endif %}
+                        </h4>
+                        <p>{{ property['floor_area'] }} SQ FT | {{ property['years_remaining'] }} Years Remaining</p>
+                      </div>
+                      <div class="aa-properties-detial">
+                        <div
+                          style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap;">
+
+                          <!-- Price on the left -->
+                          <span class="aa-price" style="flex: 1;">
+                            Listed for: ${{ "{:,.1f}".format(property['listing_price']) }}
+                          </span>
+
+                          <!-- Review Agent centered -->
+                          {% if property['status'] == 'C' %}
+                          <div style="flex: 1; text-align: center;">
+                            <a class="btn btn-success" onclick="openReviewAgentModal({{ property['id'] }})">
+                              Review Agent
+                            </a>
+                          </div>
+                          {% endif %}
+
+                          <!-- More Details on the right -->
+                          <div style="flex: 1; text-align: right;">
+                            <a class="aa-secondary-btn" onclick="loadPropertyDetails({{ property['id'] }})">
+                              View Biddings
+                            </a>
+                            <a class="aa-secondary-btn"
+                              style="background-color: #28a745; border-color: #28a745; color: white; margin-right: 8px;"
+                              onclick="openEditBiddingsModal({{ property['id'] }})">
+                              Edit Biddings
+                            </a>
+                          </div>
+
+                        </div>
+                      </div>
+                  </article>
+                </li>
+                {% endfor %}
                 {% else %}
-                    <p style="color: black;"; class="text-center text-muted">No properties listed yet. Start listing your properties!</p>
+                <p style="color: black;" ; class="text-center text-muted">No properties listed yet. Start listing your
+                  properties!</p>
                 {% endif %}
-            </ul>            
+              </ul>
             </div>
             <!-- Start properties content bottom -->
             <!-- Start properties content bottom -->
             <div class="aa-properties-content-bottom">
               {% if total_pages > 1 %}
-                <nav>
-                  <ul class="pagination">
-                    <!-- Previous button -->
-                    <li class="{% if page == 1 %}disabled{% endif %}">
-                      <a href="{{ url_for('view_your_property', page=page-1) }}" aria-label="Previous">
-                        <span aria-hidden="true">&laquo;</span>
-                      </a>
-                    </li>
+              <nav>
+                <ul class="pagination">
+                  <!-- Previous button -->
+                  <li class="{% if page == 1 %}disabled{% endif %}">
+                    <a href="{{ url_for('view_your_property', page=page-1) }}" aria-label="Previous">
+                      <span aria-hidden="true">&laquo;</span>
+                    </a>
+                  </li>
 
-                    <!-- Page numbers -->
-                    {% for p in range(1, total_pages + 1) %}
-                      <li class="{% if p == page %}active{% endif %}">
-                        <a href="{{ url_for('view_your_property', page=p) }}">{{ p }}</a>
-                      </li>
-                    {% endfor %}
+                  <!-- Page numbers -->
+                  {% for p in range(1, total_pages + 1) %}
+                  <li class="{% if p == page %}active{% endif %}">
+                    <a href="{{ url_for('view_your_property', page=p) }}">{{ p }}</a>
+                  </li>
+                  {% endfor %}
 
-                    <!-- Next button -->
-                    <li class="{% if page == total_pages %}disabled{% endif %}">
-                      <a href="{{ url_for('view_your_property', page=page+1) }}" aria-label="Next">
-                        <span aria-hidden="true">&raquo;</span>
-                      </a>
-                    </li>
-                  </ul>
-                </nav>
+                  <!-- Next button -->
+                  <li class="{% if page == total_pages %}disabled{% endif %}">
+                    <a href="{{ url_for('view_your_property', page=page+1) }}" aria-label="Next">
+                      <span aria-hidden="true">&raquo;</span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
               {% endif %}
             </div>
           </div>
@@ -239,10 +252,11 @@
       </div>
     </div>
   </section>
-  <!-- / Properties  --> 
+  <!-- / Properties  -->
 
   <!-- Review Agent Modal -->
-  <div class="modal fade" id="reviewAgentModal" tabindex="-1" role="dialog" aria-labelledby="reviewAgentModalLabel" aria-hidden="true">
+  <div class="modal fade" id="reviewAgentModal" tabindex="-1" role="dialog" aria-labelledby="reviewAgentModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content" style="color:black;">
         <div class="modal-header">
@@ -271,78 +285,116 @@
     <div class="container">
       <div class="row">
         <div class="col-md-12">
-        <div class="aa-footer-area">
-          <div class="row">
-            <div class="col-md-3 col-sm-6 col-xs-12">
-              <div class="aa-footer-left">
-               <p>Designed by <a rel="nofollow" href="http://www.markups.io/">MarkUps.io</a></p>
+          <div class="aa-footer-area">
+            <div class="row">
+              <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="aa-footer-left">
+                  <p>Designed by <a rel="nofollow" href="http://www.markups.io/">MarkUps.io</a></p>
+                </div>
+              </div>
+              <div class="col-md-3 col-sm-6 col-xs-12">
+                <div class="aa-footer-middle">
+                  <a href="#"><i class="fa fa-facebook"></i></a>
+                  <a href="#"><i class="fa fa-twitter"></i></a>
+                  <a href="#"><i class="fa fa-google-plus"></i></a>
+                  <a href="#"><i class="fa fa-youtube"></i></a>
+                </div>
+              </div>
+              <div class="col-md-6 col-sm-12 col-xs-12">
+                <div class="aa-footer-right">
+                  <a href="#">Home</a>
+                  <a href="#">Support</a>
+                  <a href="#">License</a>
+                  <a href="#">FAQ</a>
+                  <a href="#">Privacy & Term</a>
+                </div>
               </div>
             </div>
-            <div class="col-md-3 col-sm-6 col-xs-12">
-              <div class="aa-footer-middle">
-                <a href="#"><i class="fa fa-facebook"></i></a>
-                <a href="#"><i class="fa fa-twitter"></i></a>
-                <a href="#"><i class="fa fa-google-plus"></i></a>
-                <a href="#"><i class="fa fa-youtube"></i></a>
-              </div>
-            </div>
-            <div class="col-md-6 col-sm-12 col-xs-12">
-              <div class="aa-footer-right">
-                <a href="#">Home</a>
-                <a href="#">Support</a>
-                <a href="#">License</a>
-                <a href="#">FAQ</a>
-                <a href="#">Privacy & Term</a>
-              </div>
-            </div>            
           </div>
         </div>
-      </div>
       </div>
     </div>
   </footer>
   <!-- / Footer -->
 
-<!-- Modal -->
-<div class="modal fade" id="propertyModal" tabindex="-1" role="dialog" aria-labelledby="propertyModalLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg" role="document">
-    <div class="modal-content" style="color: black;">
-      <div class="modal-header">
-        <h5 class="modal-title" id="propertyModalLabel">Property Details</h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <div id="property-details">
-          <p><strong>Flat Type:</strong> <span id="modal-flat-type"></span></p>
-          <p><strong>Town:</strong> <span id="modal-town"></span></p>
-          <p><strong>Street Name:</strong> <span id="modal-street-name"></span></p>
-          <p><strong>Floor Area:</strong> <span id="modal-floor-area"></span> SQ FT</p>
-          <p><strong>Maximum commission:</strong> <span id="modal-max-com-bid"> %</span></p>
-          <p><strong>Years Remaining:</strong> <span id="modal-years-remaining"></span></p>
-          <p><strong>Listing Price:</strong> $<span id="modal-listing-price"></span></p>
+  <!-- Edit Biddings Modal -->
+  <div class="modal fade" id="editBiddingsModal" tabindex="-1" role="dialog" aria-labelledby="editBiddingsModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content" style="color: black;">
+        <div class="modal-header">
+          <h5 class="modal-title">Edit Property Listing</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span>&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <form id="edit-biddings-form">
+            <input type="hidden" id="edit-property-id">
+            <div class="form-group">
+              <label for="edit-price">Listing Price</label>
+              <input type="number" step="0.01" id="edit-price" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="edit-max-commission">Maximum commission (1-5%):</label>
+              <input type="number" id="edit-max-commission" class="form-control" min="1" max="5" step="0.1"
+                oninput="enforceOneDecimal(this)" required>
+              <small id="edit-max-commission-error" style="color: red; display: none;">Value must be between 1% and5%.</small>
+            </div>
 
-        <hr>
-        <h5>Current Bidders</h5>
-        <table class="table table-striped">
-          <thead>
-            <tr>
-              <th>Bidder</th>
-              <th>Bid Amount</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="bidder-list">
-            <!-- Filled by JavaScript -->
-          </tbody>
-        </table>
-        </table>
+            <div class="form-group">
+              <label for="edit-years-remaining">Years Remaining</label>
+              <input type="number" id="edit-years-remaining" class="form-control">
+            </div>
+            <button type="button" class="btn btn-primary" onclick="submitEditBiddings()">Save Changes</button>
+            <button type="button" class="btn btn-danger mt-2" onclick="confirmDeleteListing()">Delete Listing</button>  
+          </form>
+        </div>
       </div>
     </div>
   </div>
-</div>
+
+  <!-- Modal -->
+  <div class="modal fade" id="propertyModal" tabindex="-1" role="dialog" aria-labelledby="propertyModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content" style="color: black;">
+        <div class="modal-header">
+          <h5 class="modal-title" id="propertyModalLabel">Property Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div id="property-details">
+            <p><strong>Flat Type:</strong> <span id="modal-flat-type"></span></p>
+            <p><strong>Town:</strong> <span id="modal-town"></span></p>
+            <p><strong>Street Name:</strong> <span id="modal-street-name"></span></p>
+            <p><strong>Floor Area:</strong> <span id="modal-floor-area"></span> SQ FT</p>
+            <p><strong>Maximum commission:</strong> <span id="modal-max-com-bid"> %</span></p>
+            <p><strong>Years Remaining:</strong> <span id="modal-years-remaining"></span></p>
+            <p><strong>Listing Price:</strong> $<span id="modal-listing-price"></span></p>
+          </div>
+
+          <hr>
+          <h5>Current Bidders</h5>
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>Bidder</th>
+                <th>Bid Amount</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="bidder-list">
+              <!-- Filled by JavaScript -->
+            </tbody>
+          </table>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- jQuery library -->
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
@@ -357,11 +409,11 @@
   <script>
     console.log("JS script loaded!");
   </script>
-  
+
   <script>
     let currentReviewPropertyId = null;
     let currentAgentUsername = null;
-  
+
     function openReviewAgentModal(propertyId) {
       // Get the accepted agent from backend
       fetch(`/get_property_details/${propertyId}`)
@@ -369,13 +421,13 @@
         .then(data => {
           const property = data.property;
           const bidders = data.bidders;
-  
+
           // Assuming first bidder was accepted (can improve this)
           if (!bidders || bidders.length === 0) {
             alert("No accepted agent found.");
             return;
           }
-  
+
           const acceptedAgent = bidders[0].agent_username;
           currentReviewPropertyId = propertyId;
           currentAgentUsername = acceptedAgent;
@@ -387,16 +439,16 @@
           alert("Something went wrong.");
         });
     }
-  
+
     function submitReview() {
       const rating = parseInt(document.getElementById('review-rating').value);
       const review = document.getElementById('review-text').value;
-  
+
       if (!rating || rating < 1 || rating > 5) {
         alert("Rating must be between 1 and 5.");
         return;
       }
-  
+
       fetch('/mark_as_sold', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -419,10 +471,11 @@
         });
     }
   </script>
-  
-  
-  
-    
 
-  </body>
+
+
+
+
+</body>
+
 </html>

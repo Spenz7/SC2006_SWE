@@ -294,3 +294,53 @@ def mark_as_sold():
         return jsonify({'success': True, 'message': 'Property marked as sold and review saved.'})
     except Exception as e:
         return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+    
+
+# Update listing details (price, max commission, years remaining)
+@property_bp.route('/update_listing', methods=['POST'])
+def update_listing():
+    if 'username' not in session or session.get('user_type') != 'seller':
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
+
+    data = request.get_json()
+    property_id = data.get('property_id')
+    listing_price = data.get('listing_price')
+    max_com_bid = data.get('max_com_bid')
+    years_remaining = data.get('years_remaining')
+
+    if not all([property_id, listing_price, max_com_bid, years_remaining]):
+        return jsonify({'success': False, 'message': 'Missing fields'}), 400
+
+    try:
+        conn = sqlite3.connect('listings.db')
+        c = conn.cursor()
+        c.execute('''
+            UPDATE listings
+            SET listing_price = ?, max_com_bid = ?, years_remaining = ?
+            WHERE id = ? AND seller_username = ?
+        ''', (listing_price, max_com_bid, years_remaining, property_id, session['username']))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Listing updated successfully.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
+
+
+@property_bp.route('/delete_listing/<int:property_id>', methods=['DELETE'])
+def delete_listing(property_id):
+    if 'username' not in session or session.get('user_type') != 'seller':
+        return jsonify({'success': False, 'message': 'Unauthorized access'}), 403
+
+    username = session['username']
+
+    try:
+        conn = sqlite3.connect('listings.db')
+        c = conn.cursor()
+        c.execute("DELETE FROM listings WHERE id = ? AND seller_username = ?", (property_id, username))
+        conn.commit()
+        conn.close()
+
+        return jsonify({'success': True, 'message': 'Listing deleted successfully.'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': f'Error: {str(e)}'}), 500
