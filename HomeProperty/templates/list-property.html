@@ -1,243 +1,253 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">    
-    <title>Home Property | 404</title>
 
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nouislider.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-color/default-theme.css') }}"> 
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Home Property | 404</title>
 
-   
-    <!-- Google Font -->
-    <link href='https://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>    
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-    
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/font-awesome.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/slick.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/nouislider.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery.fancybox.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-color/default-theme.css') }}">
 
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
-    <!--[if lt IE 9]>
+
+  <!-- Google Font -->
+  <link href='https://fonts.googleapis.com/css?family=Vollkorn' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+
+  <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
       <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
-  
 
-  </head>
 
-  <!-- Start header section -->
-  <header id="aa-header">  
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="aa-header-area">
-            <div class="row">
-              <div class="col-md-6 col-sm-6 col-xs-6">
-                <div class="aa-header-left">
-                  <div class="aa-telephone-no">
+</head>
+
+<!-- Start header section -->
+<header id="aa-header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="aa-header-area">
+          <div class="row">
+            <div class="col-md-6 col-sm-6 col-xs-6">
+              <div class="aa-header-left">
+                <div class="aa-telephone-no">
                   SC2006-SCSB-T4
-                  </div>
-                  <div class="aa-email hidden-xs">
-                  </div>
-                </div>              
-              </div>
-              <div class="col-md-6 col-sm-6 col-xs-6">
-                <div class="aa-header-right">
+                </div>
+                <div class="aa-email hidden-xs">
                 </div>
               </div>
             </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </header>
-  <!-- End header section -->
-  <!-- Start menu section -->
-<section id="aa-menu-area">
-    <nav class="navbar navbar-default main-navbar" role="navigation">  
-      <div class="container">
-        <div class="navbar-header">
-          <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
-          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
-            <span class="sr-only">Toggle navigation</span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </button>
-          
-          <!-- LOGO -->                                               
-          <!-- Text based logo -->
-          <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
-          <!-- Image based logo -->
-          <a class="navbar-brand aa-logo-img" href="/seller_dashboard"><img src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a> 
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-          <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
-              <li><a href="/seller_dashboard">HOME</a></li>
-              {% if 'username' in session %}
-                  {% if session['user_type'] == 'seller' %}
-                      <!-- Seller-specific menu -->
-                      <li class="active"><a href="/list-property">List Property</a></li>
-                      <li><a href="/view_your_property">Your Property</a></li>
-                  
-                  {% elif session['user_type'] == 'agent' %}
-                      <!-- Agent-specific menu -->
-                      <li><a href="/view_listed_property">View Listed Property</a></li>
-                      <li><a href="/view_bidded_property">View Bidded Property</a></li>
-                  {% endif %}
-                  
-                  <li><a href="/logout" class="aa-logout">Logout</a></li>
-              {% else %}
-                  <li><a href="/gallery">GALLERY</a></li>                                         
-                  <li class="dropdown">
-                      <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('blog_archive') }}">BLOG <span class="caret"></span></a>
-                      <ul class="dropdown-menu" role="menu">                
-                          <li><a href="/blog-archive">BLOG</a></li>
-                          <li><a href="/blog-single">BLOG DETAILS</a></li>                                            
-                      </ul>
-                  </li>
-                  <li><a href="/contact">CONTACT</a></li>
-                  <li><a href="/create_account" class="aa-register">Register</a></li>
-                  <li><a href="/login" class="aa-login">Login</a></li>
-              {% endif %}
-          </ul>
-        </div>
-    </nav> 
-  </section>
-  <!-- End menu section -->
-
-  <!-- Start Prozerty header  -->
-  <section id="aa-property-header">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-12">
-          <div class="aa-property-header-inner">
-            <h1>LIST YOUR PROPERTY HERE</h1>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section> 
-  <!-- End Proerty header  -->
-  <section id="aa-error">
-    <section class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            {% for category, message in messages %}
-              <div class="alert alert-{{ category }} alert-dismissible fade in" role="alert" style="margin-top: 20px;">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span>&times;</span></button>
-                {{ message }}
+            <div class="col-md-6 col-sm-6 col-xs-6">
+              <div class="aa-header-right">
               </div>
-            {% endfor %}
-          {% endif %}
-        {% endwith %}
-      <form id="property-form" method="POST" action="/list-property">
-          <!-- Flat Type -->
-          <div class="form-group">
-              <label class=label-flat-type for="flat_type">Flat Type:</label>
-              <select id="flat_type" name="flat_type" class="form-control" required>
-                  <option value="">Select Flat Type</option>
-                  <option value="4 ROOM">4 ROOM</option>
-                  <option value="3 ROOM">3 ROOM</option>
-                  <option value="5 ROOM">5 ROOM</option>
-                  <option value="EXECUTIVE">EXECUTIVE</option>
-                  <option value="2 ROOM">2 ROOM</option>
-                  <option value="1 ROOM">1 ROOM</option>
-                  <option value="MULTI-GENERATION">MULTI-GENERATION</option>
-              </select>
-          </div>
-
-          <!-- Town Dropdown -->
-          <div class="form-group">
-              <label for="town">Town:</label>
-              <select id="town" name="town" class="form-control" required>
-                  <option value="">Loading towns...</option>
-              </select>
-          </div>
-
-          <!-- Street Name Dropdown -->
-          <div class="form-group">
-              <label for="street_name">Street Name:</label>
-              <select id="street_name" name="street_name" class="form-control" required>
-                  <option value="">Select a Street</option>
-              </select>
-          </div>
-
-          <!-- Floor Area (sq ft) -->
-          <div class="form-group">
-              <label for="floor_area">Floor Area (sq ft):</label>
-              <input type="number" id="floor_area" name="floor_area" class="form-control" min="1" required>
-              <small id="floor-area-error" style="color: red; display: none;">Floor area cannot be negative.</small>
-          </div>
-
-          <!-- Minimum Bid Interval -->
-          <div class="form-group">
-              <label for="max_com_bid">Maximum commission  (1-5%):</label>
-              <input type="number" id="max_com_bid" name="max_com_bid" class="form-control" min="1" max="5" step="0.1" required>
-              <small id="max_com_bid_error" style="color: red; display: none;">Value must be between 1% and 5%.</small>
-          </div>
-
-          <!-- Years Remaining -->
-          <div class="form-group">
-              <label for="years_remaining">Years Remaining:</label>
-              <input type="number" id="years_remaining" name="years_remaining" class="form-control" min="1" required>
-          </div>
-
-          <div class="form-group d-flex align-items-center">
-            <button type="button" class="btn btn-primary" onclick="fetchPastPrices()">Fetch Past Prices</button>
-            <div id="past-price-display" style="margin-top: 15px;"></div>
-            <table id="price-table" class="table table-bordered" style="display: none; margin-top: 10px; color: black;">
-              <thead>
-                  <tr>
-                      <th>Month</th>
-                      <th>Town</th>
-                      <th>Flat Type</th>
-                      <th>Block</th>
-                      <th>Street</th>
-                      <th>Storey Range</th>
-                      <th>Flat Model</th>
-                      <th>Floor Area</th>
-                      <th>Remaining Lease</th>
-                      <th>Resale Price ($)</th>
-                  </tr>
-              </thead>
-              <tbody id="price-table-body">
-              </tbody>
-              </table>
             </div>
-          <div class="form-group" id="past-prices" style="display:none;">
-              <label>Past Prices (Government Data):</label>
-              <ul id="past-prices-list"></ul>
           </div>
-
-          <!-- Listing Price -->
-          <div class="form-group">
-              <label for="listing_price">Set Your Listing Price ($):</label>
-              <input type="number" id="listing_price" name="listing_price" class="form-control" required>
-          </div>
-
-          <!-- Submit Button -->
-          <button type="submit" class="aa-btnlistproperty">Submit Property</button>
-      </form>
-  </section>
-  </section>
-
-
-  <!-- Footer -->
-  <footer id="aa-footer">
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<!-- End header section -->
+<!-- Start menu section -->
+<section id="aa-menu-area">
+  <nav class="navbar navbar-default main-navbar" role="navigation">
     <div class="container">
-      <div class="row">
-        <div class="col-md-12">
+      <div class="navbar-header">
+        <!-- FOR MOBILE VIEW COLLAPSED BUTTON -->
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+          aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+
+        <!-- LOGO -->
+        <!-- Text based logo -->
+        <!--<a class="navbar-brand aa-logo" href="/"> Home <span>Property</span></a> -->
+        <!-- Image based logo -->
+        <a class="navbar-brand aa-logo-img" href="/seller_dashboard"><img
+            src="{{ url_for('static', filename='img/logo.png') }}" alt="logo"></a>
+      </div>
+      <div id="navbar" class="navbar-collapse collapse">
+        <ul id="top-menu" class="nav navbar-nav navbar-right aa-main-nav">
+          <li><a href="/seller_dashboard">HOME</a></li>
+          {% if 'username' in session %}
+          {% if session['user_type'] == 'seller' %}
+          <!-- Seller-specific menu -->
+          <li class="active"><a href="/list-property">List Property</a></li>
+          <li><a href="/view_your_property">Your Property</a></li>
+
+          {% elif session['user_type'] == 'agent' %}
+          <!-- Agent-specific menu -->
+          <li><a href="/view_listed_property">View Listed Property</a></li>
+          <li><a href="/view_bidded_property">View Bidded Property</a></li>
+          {% endif %}
+
+          <li><a href="/logout" class="aa-logout">Logout</a></li>
+          {% else %}
+          <li><a href="/gallery">GALLERY</a></li>
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for('blog_archive') }}">BLOG <span
+                class="caret"></span></a>
+            <ul class="dropdown-menu" role="menu">
+              <li><a href="/blog-archive">BLOG</a></li>
+              <li><a href="/blog-single">BLOG DETAILS</a></li>
+            </ul>
+          </li>
+          <li><a href="/contact">CONTACT</a></li>
+          <li><a href="/create_account" class="aa-register">Register</a></li>
+          <li><a href="/login" class="aa-login">Login</a></li>
+          {% endif %}
+        </ul>
+      </div>
+  </nav>
+</section>
+<!-- End menu section -->
+
+<!-- Start Prozerty header  -->
+<section id="aa-property-header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="aa-property-header-inner">
+          <h1>LIST YOUR PROPERTY HERE</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End Proerty header  -->
+<section id="aa-error">
+  <section class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade in" role="alert" style="margin-top: 20px;">
+      <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span>&times;</span></button>
+      {{ message }}
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <form id="property-form" method="POST" action="/list-property">
+      <!-- Flat Type -->
+      <div class="form-group">
+        <label class=label-flat-type for="flat_type">Flat Type:</label>
+        <select id="flat_type" name="flat_type" class="form-control" required>
+          <option value="">Select Flat Type</option>
+          <option value="4 ROOM">4 ROOM</option>
+          <option value="3 ROOM">3 ROOM</option>
+          <option value="5 ROOM">5 ROOM</option>
+          <option value="EXECUTIVE">EXECUTIVE</option>
+          <option value="2 ROOM">2 ROOM</option>
+          <option value="1 ROOM">1 ROOM</option>
+          <option value="MULTI-GENERATION">MULTI-GENERATION</option>
+        </select>
+      </div>
+
+      <!-- Town Dropdown -->
+      <div class="form-group">
+        <label for="town">Town:</label>
+        <select id="town" name="town" class="form-control" required>
+          <option value="">Loading towns...</option>
+        </select>
+      </div>
+
+      <!-- Street Name Dropdown -->
+      <div class="form-group">
+        <label for="street_name">Street Name:</label>
+        <select id="street_name" name="street_name" class="form-control" required>
+          <option value="">Select a Street</option>
+        </select>
+      </div>
+
+      <!-- Floor Area (sq ft) -->
+      <div class="form-group">
+        <label for="floor_area">Floor Area (sq ft):</label>
+        <input type="number" id="floor_area" name="floor_area" class="form-control" min="1" required>
+        <small id="floor-area-error" style="color: red; display: none;">Floor area cannot be negative.</small>
+      </div>
+
+      <!-- Minimum Bid Interval -->
+      <div class="form-group">
+        <label for="max_com_bid">Maximum commission (1-5%):</label>
+        <input type="number" id="max_com_bid" name="max_com_bid" class="form-control" min="1" max="5" step="0.1"
+          required>
+        <small id="max_com_bid_error" style="color: red; display: none;">Value must be between 1% and 5%.</small>
+      </div>
+
+      <!-- Years Remaining -->
+      <div class="form-group">
+        <label for="years_remaining">Years Remaining:</label>
+        <input type="number" id="years_remaining" name="years_remaining" class="form-control" min="1" required>
+      </div>
+
+      <div class="form-group d-flex align-items-center">
+        <button type="button" class="btn btn-primary" onclick="fetchPastPrices()">Fetch Past Prices</button>
+        <!-- FontAwesome Loading Spinner -->
+        <div id="price-loading" style="display: none; text-align: center; margin-top: 15px;">
+          <i class="fa fa-spinner fa-spin fa-2x" style="color: #888;"></i>
+          <p style="color: #777;">Fetching past resale prices...</p>
+        </div>
+        <div id="past-price-display" style="margin-top: 15px;"></div>
+        <table id="price-table" class="table table-bordered" style="display: none; margin-top: 10px; color: black;">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Town</th>
+              <th>Flat Type</th>
+              <th>Block</th>
+              <th>Street</th>
+              <th>Storey Range</th>
+              <th>Flat Model</th>
+              <th>Floor Area</th>
+              <th>Remaining Lease</th>
+              <th>Resale Price ($)</th>
+            </tr>
+          </thead>
+          <tbody id="price-table-body">
+          </tbody>
+        </table>
+      </div>
+      <div class="form-group" id="past-prices" style="display:none;">
+        <label>Past Prices (Government Data):</label>
+        <ul id="past-prices-list"></ul>
+      </div>
+
+      <!-- Listing Price -->
+      <div class="form-group">
+        <label for="listing_price">Set Your Listing Price ($):</label>
+        <input type="number" id="listing_price" name="listing_price" class="form-control" required>
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="aa-btnlistproperty">Submit Property</button>
+    </form>
+  </section>
+</section>
+
+
+<!-- Footer -->
+<footer id="aa-footer">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
         <div class="aa-footer-area">
           <div class="row">
             <div class="col-md-3 col-sm-6 col-xs-12">
               <div class="aa-footer-left">
-               <p>Designed by <a rel="nofollow" href="http://www.markups.io/">MarkUps.io</a></p>
+                <p>Designed by <a rel="nofollow" href="http://www.markups.io/">MarkUps.io</a></p>
               </div>
             </div>
             <div class="col-md-3 col-sm-6 col-xs-12">
@@ -256,56 +266,68 @@
                 <a href="#">FAQ</a>
                 <a href="#">Privacy & Term</a>
               </div>
-            </div>            
+            </div>
           </div>
         </div>
       </div>
-      </div>
     </div>
-  </footer>
-  <!-- / Footer -->
-  <script>
-  
+  </div>
+</footer>
+<!-- / Footer -->
+<script>
+
   let fetchTriggeredManually = false;
 
-    function fetchPastPrices() {
-      fetchTriggeredManually = true; 
-      sessionStorage.setItem('fetchedPrices', 'true');  // ✅ SET THE FLAG HERE
-      
-      const flatType = document.getElementById("flat_type").value;
-      const town = document.getElementById("town").value;
-      const floorArea = document.getElementById("floor_area").value;
-      const leaseYears = document.getElementById("years_remaining").value;
-  
-      if (!flatType || !town || !floorArea || !leaseYears) {
-        alert("Please fill in all fields to fetch resale prices.");
-        return;
-      }
-  
-      const apiUrl = `/get_similar_prices?flat_type=${encodeURIComponent(flatType)}&town=${encodeURIComponent(town)}&floor_area=${floorArea}&years_remaining=${leaseYears}`;
-  
-      fetch(apiUrl)
+  function fetchPastPrices() {
+    fetchTriggeredManually = true;
+    sessionStorage.setItem('fetchedPrices', 'true');  // ✅ SET THE FLAG HERE
+
+    const flatType = document.getElementById("flat_type").value;
+    const town = document.getElementById("town").value;
+    const floorArea = document.getElementById("floor_area").value;
+    const leaseYears = document.getElementById("years_remaining").value;
+
+    if (!flatType || !town || !floorArea || !leaseYears) {
+      alert("Please fill in all fields to fetch resale prices.");
+      return;
+    }
+    const loadingDiv = document.getElementById("price-loading");
+    const display = document.getElementById("past-price-display");
+    const table = document.getElementById("price-table");
+    const body = document.getElementById("price-table-body");
+
+    // Show loading spinner and reset everything else
+    display.textContent = "";
+    body.innerHTML = "";
+    loadingDiv.style.display = "block";
+    table.style.display = "none";
+
+    const apiUrl = `/get_similar_prices?flat_type=${encodeURIComponent(flatType)}&town=${encodeURIComponent(town)}&floor_area=${floorArea}&years_remaining=${leaseYears}`;
+
+    fetch(apiUrl)
       .then(response => {
-      console.log("📥 Raw response:", response);
-      if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.json();
+        console.log("📥 Raw response:", response);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
       })
-        
-        .then(data => {
-          console.log("✅ Parsed data:", data);
-          const display = document.getElementById("past-price-display");
-          const table = document.getElementById("price-table");
-          const body = document.getElementById("price-table-body");
-  
-          console.log("📦 Received resale data:", data);
-          body.innerHTML = "";
-  
-          if (Array.isArray(data) && data.length) {
-            data.forEach(record => {
-              const row = document.createElement("tr");
-              row.innerHTML = `
+
+      .then(data => {
+        console.log("✅ Parsed data:", data);
+        const display = document.getElementById("past-price-display");
+        const table = document.getElementById("price-table");
+        const body = document.getElementById("price-table-body");
+
+        document.getElementById("price-loading").style.display = "none";
+
+        console.log("📦 Received resale data:", data);
+        body.innerHTML = "";
+
+        if (Array.isArray(data) && data.length) {
+          data.forEach(record => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
                 <td>${record.month}</td>
                 <td>${record.town}</td>
                 <td>${record.flat_type}</td>
@@ -317,48 +339,49 @@
                 <td>${record.remaining_lease}</td>
                 <td>$${parseFloat(record.resale_price).toLocaleString()}</td>
               `;
-              body.appendChild(row);
-            });
-  
-            display.textContent = "Showing up to 5 recent similar resale transactions:";
-            display.style.color = "green";
-            table.style.display = "table";
-          } else {
-            display.textContent = "😕 No close matches found just yet.\nTry adjusting the floor area or lease duration to see more results.";
-            display.style.color = "#555";  // softer color for a pleasant feel
-            display.style.fontStyle = "italic";
-            display.style.whiteSpace = "pre-line";  // allows line break in text
-            table.style.display = "none";
+            body.appendChild(row);
+          });
+
+          display.textContent = "Showing up to 5 recent similar resale transactions:";
+          display.style.color = "green";
+          table.style.display = "table";
+        } else {
+          display.textContent = "😕 No close matches found just yet.\nTry adjusting the floor area or lease duration to see more results.";
+          display.style.color = "#555";  // softer color for a pleasant feel
+          display.style.fontStyle = "italic";
+          display.style.whiteSpace = "pre-line";  // allows line break in text
+          table.style.display = "none";
         }
-        })
-        .catch(err => {
-          document.getElementById("past-price-display").textContent = "Error fetching data.";
-          document.getElementById("past-price-display").style.color = "red";
-          document.getElementById("price-table").style.display = "none";
-          console.error(err);
-        });
-    }
-    window.addEventListener("DOMContentLoaded", () => {
+      })
+      .catch(err => {
+        document.getElementById("past-price-display").textContent = "Error fetching data.";
+        document.getElementById("past-price-display").style.color = "red";
+        document.getElementById("price-table").style.display = "none";
+        console.error(err);
+      });
+  }
+  window.addEventListener("DOMContentLoaded", () => {
     // Prevent re-fetch after form submission
     if (sessionStorage.getItem('fetchedPrices')) {
       console.log("🛑 Skipping fetch on reload");
       sessionStorage.removeItem('fetchedPrices');  // Clean up
     }
   });
-  </script>
+</script>
 
-  
-  <!-- jQuery library -->
-  <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/slick.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/nouislider.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/streetname.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/login.js') }}"></script>
-  <script src="{{ url_for('static', filename='js/logout.js') }}"></script>
 
-  </body>
+<!-- jQuery library -->
+<script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
+<script src="{{ url_for('static', filename='js/slick.js') }}"></script>
+<script src="{{ url_for('static', filename='js/nouislider.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
+<script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+<script src="{{ url_for('static', filename='js/streetname.js') }}"></script>
+<script src="{{ url_for('static', filename='js/login.js') }}"></script>
+<script src="{{ url_for('static', filename='js/logout.js') }}"></script>
+
+</body>
+
 </html>
