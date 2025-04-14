@@ -225,17 +225,25 @@
                 </a>
                 <div class="aa-tag for-sale">For Sale</div>
                 <div class="aa-properties-item-content">
-                  <div class="aa-properties-info">
-                    <span>{{ listing['flat_type'] }}</span>
-                    <span>{{ listing['floor_area'] }} SQ FT</span>
-                    <span>{{ listing['town'] }}</span>
-                  </div>
                   <div class="aa-properties-about">
-                    <h3><a href="#">{{ listing['flat_type'] }} in {{ listing['town'] }}</a></h3>
+                    <h3>
+                      <a href="#">
+                        {% if listing['flat_type'] in ['4 ROOM', '5 ROOM', 'MULTI-GENERATION', '3 ROOM', '2 ROOM', '1 ROOM'] %}
+                          {{ listing['flat_type'] }} Flat in {{ listing['town'] }}
+                        {% elif listing['flat_type'] == 'EXECUTIVE' %}
+                            EXECUTIVE Apartment in {{ listing['town'] }}
+                        {% else %}
+                          {{ listing['flat_type'] }} in {{ listing['town'] }}
+                        {% endif %}
+                      </a>
+                    </h3>
                     <p>{{ listing['street_name'] }}</p>
+                    <p>{{ listing['floor_area'] }} SQ FT</p>
+                    <p><strong>Sold by:</strong> {{ listing['seller_username'] or "N/A" }}</p>
+                    <p><strong>To agent:</strong> {{ listing['agent_username'] or "N/A" }}</p>
                   </div>
                   <div class="aa-properties-detial">
-                    <span class="aa-price">${{ listing['listing_price'] }}</span>
+                    <span class="aa-price">${{ "{:,.1f}".format(listing['listing_price']) }}</span>
                   </div>
                 </div>
               </article>
