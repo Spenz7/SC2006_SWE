@@ -8,3 +8,4 @@ HomeProperty/services/__pycache__/agent_checker.cpython-312.pyc
 HomeProperty/services/__pycache__/otp_service.cpython-312.pyc
 HomeProperty/services/__pycache__/resale_price_service.cpython-312.pyc
 HomeProperty/utils/__pycache__/validators.cpython-312.pyc
+accounts.db
