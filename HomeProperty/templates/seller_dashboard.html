@@ -221,7 +221,8 @@
             <div class="col-md-4">
               <article class="aa-properties-item">
                 <a href="#" class="aa-properties-item-img">
-                  <img src="https://via.placeholder.com/370x220" alt="img">
+                  <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="random-house-img" alt="Property Image">
+
                 </a>
                 <div class="aa-tag for-sale">For Sale</div>
                 <div class="aa-properties-item-content">
@@ -255,7 +256,7 @@
             <div class="col-md-4">
               <article class="aa-properties-item">
                 <a href="#" class="aa-properties-item-img">
-                  <img src="static/img/house3.jpg" alt="img">
+                  <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="random-house-img" alt="Property Image">
                 </a>
                 <div class="aa-tag sold-out">Sold Out</div>
                 <div class="aa-properties-item-content">
@@ -428,6 +429,22 @@
 
 
   <!-- jQuery library -->
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const totalImages = 10;
+      const basePath = "{{ url_for('static', filename='img/houses/') }}";
+      const indexes = Array.from({ length: totalImages }, (_, i) => i + 1);
+      for (let i = indexes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+      }
+      document.querySelectorAll(".random-house-img").forEach((img, i) => {
+        const imageIndex = indexes[i % totalImages];
+        img.src = `${basePath}photo${imageIndex}.jpg`;
+      });
+    });
+  </script>
+  
   <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
   <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
   <script src="{{ url_for('static', filename='js/slick.js') }}"></script>

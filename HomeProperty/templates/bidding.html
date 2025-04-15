@@ -27,6 +27,10 @@
         padding: 20px;
       }
       .property-card {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
         border: 1px solid #ddd;
         padding: 15px;
         border-radius: 8px;
@@ -34,7 +38,9 @@
         text-align: center;
       }
       .property-card img {
+        height: 250px;
         max-width: 100%;
+        object-fit: cover;
         border-radius: 8px;
       }
       .property-card h4, .property-card p {
@@ -228,7 +234,7 @@
           {% for property in listings if property['status'] == 'A' %}
 
             <div class="property-card">
-              <img src="{{ url_for('static', filename='img/house3.jpg') }}" alt="Property Image">
+              <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="card-img-top random-house-img" alt="Property Image">
               <h4>{{ property['flat_type'] }} in {{ property['town'] }}</h4>
               <p>{{ property['floor_area'] }} SQ FT | ${{ property['listing_price'] }}</p>
               <p>Max Commission: {{ property['max_com_bid'] }}%</p>
@@ -315,7 +321,23 @@
           input.value = value.slice(0, -1); // remove last character if it's invalid
         }
       }
-    </script>      
+    </script>  
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const totalImages = 10;
+        const basePath = "{{ url_for('static', filename='img/houses/') }}";
+        const indexes = Array.from({ length: totalImages }, (_, i) => i + 1);
+        for (let i = indexes.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+        }
+        document.querySelectorAll(".random-house-img").forEach((img, i) => {
+          const imageIndex = indexes[i % totalImages];
+          img.src = `${basePath}photo${imageIndex}.jpg`;
+        });
+      });
+    </script>
+        
   </body>
 
 

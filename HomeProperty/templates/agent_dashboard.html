@@ -151,7 +151,7 @@
             <li><a href="contact">CONTACT</a></li>
            <li><a href="404">404 PAGE</a></li>
           </ul>                            
-        </div>--><!--/.nav-collapse -->    -->   
+        </div>--><!--/.nav-collapse -->    
       </div>          
     </nav> 
   </section>
@@ -193,8 +193,8 @@
       </div>
     </div>
   </section>
-  <!-- / About us -->
-
+  <!-- Unsold Properties -->
+  
   <section id="aa-latest-property">
     <div class="container">
       <div class="aa-latest-property-area">
@@ -206,13 +206,11 @@
   
         <div class="aa-latest-properties-content">
           <div class="row">
-  
-            <!-- Unsold Properties -->
             {% for listing in unsold_listings %}
             <div class="col-md-4">
               <article class="aa-properties-item">
                 <a href="#" class="aa-properties-item-img">
-                  <img src="static/img/house1.jpg" alt="img">
+                    <img class="random-house-img" src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="img">
                 </a>
                 <div class="aa-tag for-sale">For Sale</div>
                 <div class="aa-properties-item-content">
@@ -246,7 +244,7 @@
             <div class="col-md-4">
               <article class="aa-properties-item">
                 <a href="#" class="aa-properties-item-img">
-                  <img src="static/img/house3.jpg" alt="img">
+                    <img class="random-house-img" src="{{ url_for('static', filename='img/placeholder.jpg') }}" alt="img">
                 </a>
                 <div class="aa-tag sold-out">Sold Out</div>
                 <div class="aa-properties-item-content">
@@ -413,5 +411,25 @@
   <script src="{{ url_for('static', filename='js/jquery.mixitup.js') }}"></script>
   <script src="{{ url_for('static', filename='js/jquery.fancybox.pack.js') }}"></script>
   <script src="{{ url_for('static', filename='js/custom.js') }}"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const totalImages = 10;
+      const basePath = "{{ url_for('static', filename='img/houses/') }}";
+  
+      const indexes = Array.from({ length: totalImages }, (_, i) => i + 1);
+      for (let i = indexes.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+      }
+  
+      document.querySelectorAll(".random-house-img").forEach((img, i) => {
+        const imageIndex = indexes[i % totalImages];
+        img.src = `${basePath}photo${imageIndex}.jpg`;
+      });
+    });
+  </script>
+  
+
   </body>
 </html>
+  

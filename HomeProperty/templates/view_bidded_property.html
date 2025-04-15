@@ -13,19 +13,43 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/theme-color/default-theme.css') }}"> 
 
   <style>
+    .property-card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-evenly;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      background-color: white;
+    }
+
+    .card-img-top {
+      height: 250px;
+      object-fit: cover;
+    }
+
+    .card-body {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
     .property-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
       padding: 20px;
     }
-    .property-card {
-      border: 1px solid #ddd;
-      padding: 15px;
-      border-radius: 8px;
-      background: #fff;
-      text-align: center;
-    }
+    
     .property-card img {
       max-width: 100%;
       border-radius: 8px;
@@ -169,7 +193,7 @@
         <div class="col-md-4 mb-4 property-card status-{{ listing['status'] }}">
           
             <div class="card">
-              <img src="static/img/house3.jpg" class="card-img-top" alt="Property Image">
+              <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="card-img-top random-house-img" alt="Property Image">
               <div class="card-body">
                 <h5 class="card-title">{{ listing['flat_type'] }} in {{ listing['town'] }}</h5>
                 <p class="card-text">
@@ -247,6 +271,21 @@
     });
   }
   </script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const totalImages = 10;
+    const basePath = "{{ url_for('static', filename='img/houses/') }}";
+    const indexes = Array.from({ length: totalImages }, (_, i) => i + 1);
+    for (let i = indexes.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [indexes[i], indexes[j]] = [indexes[j], indexes[i]];
+    }
+    document.querySelectorAll(".card-img-top.random-house-img").forEach((img, i) => {
+      const imageIndex = indexes[i % totalImages];
+      img.src = `${basePath}photo${imageIndex}.jpg`;
+    });
+  });
+</script>
 <script src="{{ url_for('static', filename='js/jquery.min.js') }}"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.js') }}"></script>
 <script src="{{ url_for('static', filename='js/slick.js') }}"></script>
