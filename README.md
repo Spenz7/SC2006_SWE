@@ -36,24 +36,40 @@ Once the server starts, visit http://127.0.0.1:5000 in your browser to access th
 
 ### Features:
 Property listing by sellers
+
 Sellers can view bidder's profile and past reviews.
+
 Agents can view, bid and counterbid on properties
+
 Real-time price suggestions using Data.gov resale API
+
 OTP-secured registration using Twilio SMS
+
 Integrated dashboards for both agents and sellers
 
 ### Technologies Used
+
 Python + Flask
+
 SQLite
+
 HTML/CSS/JavaScript
+
 Twilio API (for OTP)
+
 Data.gov.sg API
 
 ### Team
 SC2006-SCSB-T4 Group
+
 Chong Qi En
+
 Spencer
+
 Yong khang
+
 Atul
+
 Shreya
+
 Naveen
