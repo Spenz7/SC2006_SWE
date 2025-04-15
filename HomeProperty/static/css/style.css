@@ -786,7 +786,7 @@ img {
   width: 100%;
 }
 .aa-properties-item {
-  height: 450px;
+  /*height: 450px;*/
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -810,9 +810,9 @@ img {
   box-shadow: 1px 2px 5px 3px #ccc;
 }
 .aa-properties-item .aa-properties-item-img {
-  
     height: 200px;
     overflow: hidden;
+    flex-shrink: 0;
 }
 .aa-properties-item .aa-properties-item-img img {
   width: 100%;
