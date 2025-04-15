@@ -795,6 +795,16 @@ img {
   overflow: hidden;
   padding: 10px;
   box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  position: relative;
+  float: left;
+  margin-top:30px;
+  width: 100% ;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+  -ms-transition: all 0.5s;
+  -o-transition: all 0.5s;
+  transition: all 0.5s;
+  
 }
 .aa-properties-item:hover {
   box-shadow: 1px 2px 5px 3px #ccc;
@@ -812,15 +822,42 @@ img {
 .aa-properties-item .aa-tag {
   color: #fff;
   padding: 6px 10px;
-  position: absolute;
+  position: relative;
   left: 15px;
   top: -15px;
 }
 .aa-properties-item .for-rent {
   background-color: #20ceb3;
+  position: absolute;
+  top: 12px;
+  left: -30px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 40px;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  pointer-events: none;
+  
 }
 .aa-properties-item .sold-out {
   background-color: #ff0000;
+  position: absolute;
+  top: 12px;
+  left: -30px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 4px 40px;
+  transform: rotate(-45deg);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  pointer-events: none;
+  
+
+  
+  
 }
 .aa-properties-item .aa-properties-item-content {
   background-color: #fff;
@@ -877,6 +914,7 @@ img {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
 }
 
 /*==================
