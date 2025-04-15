@@ -195,8 +195,8 @@
             <div class="card">
               <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="card-img-top random-house-img" alt="Property Image">
               <div class="card-body">
-                <h5 class="card-title" style="color:black;" >{{ listing['flat_type'] }} in {{ listing['town'] }}</h5>
-                <p class="card-text">
+                <h5 class="card-title" style="color:black; padding-left:2%;" >{{ listing['flat_type'] }} in {{ listing['town'] }}</h5>
+                <p class="card-text" style="padding-left:2%;">
                   <strong>Size:</strong> {{ listing['floor_area'] }} SQ FT<br>
                   <strong>Price:</strong> ${{ listing['listing_price'] }}<br>
                   <strong>Status:</strong>
@@ -208,9 +208,9 @@
                     <span class="badge bg-secondary">Closed</span>
                   {% endif %}<br>
                   <strong>Your Bid:</strong> {{ listing['your_bid'] }}%
-                  <p><strong>Lowest Bid:</strong> {{ listing['lowest_bid'] }}%</p>
+                  <p style="padding-left:2%; padding-left:2%;"><strong>Lowest Bid:</strong> {{ listing['lowest_bid'] }}%</p>
                   {% if listing['your_bid'] > listing['lowest_bid'] %}
-                  <p style="color:red;"><strong>You’ve been outbid.</strong></p>
+                  <p style="color:red; padding-left:2% "><strong>You’ve been outbid.</strong></p>
                   <button class="bid-button"
                           data-property-id="{{ listing['id'] }}"
                           data-title="{{ listing['flat_type'] }} in {{ listing['town'] }}"
@@ -218,7 +218,7 @@
                           data-status="{{ listing['status'] }}"
                           onclick="handleBidClick(this)">Rebid</button>
                 {% else %}
-                  <p style="color:green;"><strong>You are currently leading!</strong></p>
+                  <p style="color:green; padding-left:2%;"><strong>You are currently leading!</strong></p>
                 {% endif %}
                 </p>
               </div>
