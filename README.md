@@ -18,14 +18,20 @@ cd HomeProperty
 
 ### Step 2: Install Dependencies
 Make sure you have Python and pip installed. Then run:
+
 pip install Flask
+
 pip install twilio
+
 pip install json
+
 Note: If you encounter issues with json, it's included by default in Python. No need to install it separately.
 
 ### Step 3: Run the Flask Backend
 In the terminal in Visual Studio Code or any Codespace within Github
+
 python app.py
+
 Once the server starts, visit http://127.0.0.1:5000 in your browser to access the platform.
 
 ### Features:
