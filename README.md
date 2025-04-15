@@ -14,8 +14,7 @@ Follow the steps below to set up and run the application on your local machine.
 Open up the terminal in Visual Studio Code or any Codespace within Github
 Key this into the terminal to access the directory of the files:
 ```
-cd 2006-SCSB-T4
-cd HomeProperty
+cd 2006-SCSB-T4/HomeProperty
 ```
 
 ### Step 2: Install Dependencies
