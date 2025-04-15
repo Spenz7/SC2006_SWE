@@ -195,7 +195,7 @@
             <div class="card">
               <img src="{{ url_for('static', filename='img/placeholder.jpg') }}" class="card-img-top random-house-img" alt="Property Image">
               <div class="card-body">
-                <h5 class="card-title">{{ listing['flat_type'] }} in {{ listing['town'] }}</h5>
+                <h5 class="card-title" style="color:black;" >{{ listing['flat_type'] }} in {{ listing['town'] }}</h5>
                 <p class="card-text">
                   <strong>Size:</strong> {{ listing['floor_area'] }} SQ FT<br>
                   <strong>Price:</strong> ${{ listing['listing_price'] }}<br>
