@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify, session
 import sqlite3
 import json
-from services.resale_price_service import find_similar_past_prices  # ✅ updated import
+from services.resale_price_service import find_similar_past_prices  #updated import
 
 api_bp = Blueprint('api', __name__)
 
@@ -14,17 +14,17 @@ def get_similar_prices():
         floor_area = float(request.args.get('floor_area'))
         years_remaining = float(request.args.get('years_remaining'))
 
-        # ✅ Call the function directly (no service instance)
+        # Call the function directly (no service instance)
         results = find_similar_past_prices(flat_type, town, floor_area, years_remaining)
 
-        print("🔁 FINAL 5 RESULTS TO RETURN:")
+        print("FINAL 5 RESULTS TO RETURN:")
         for i, r in enumerate(results, start=1):
             print(f"{i}. {r}")
 
         return jsonify(results)
 
     except Exception as e:
-        print(f"❌ Error in get_similar_prices: {e}")
+        print(f"Error in get_similar_prices: {e}")
         return jsonify({"status": "error", "message": str(e)}), 500
 
 
@@ -49,7 +49,7 @@ def get_property_details(id):
         raw_bidders = json.loads(property_data.get('bidders', '[]'))
         bidders = [{"agent_username": b[0], "bid_percent": b[1]} for b in raw_bidders]
     except Exception as e:
-        print("❌ Error parsing bidders JSON:", e)
+        print("Error parsing bidders JSON:", e)
         bidders = []
 
     response = {
@@ -57,6 +57,6 @@ def get_property_details(id):
         'bidders': bidders
     }
 
-    print("📦 Returning property details:", property_data)
-    print("👥 Returning bidders:", bidders)
+    print("Returning property details:", property_data)
+    print("Returning bidders:", bidders)
     return jsonify(response)

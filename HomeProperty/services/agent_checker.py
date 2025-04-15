@@ -18,6 +18,6 @@ def check_agent_id(agent_id):
                 if record.get('registration_no') == agent_id:
                     return True
     except Exception as e:
-        print(f"[❌] Error checking agent ID: {e}")
+        print(f"Error checking agent ID: {e}")
 
     return False

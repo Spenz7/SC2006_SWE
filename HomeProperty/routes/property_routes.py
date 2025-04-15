@@ -173,7 +173,7 @@ def submit_bid():
     try:
         bidders = json.loads(listing['bidders']) if listing['bidders'] else []
     except Exception as e:
-        print("❌ Failed to parse bidders JSON:", e)
+        print("Failed to parse bidders JSON:", e)
         bidders = []
 
     agent_username = session['username']

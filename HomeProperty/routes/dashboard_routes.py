@@ -4,7 +4,7 @@ import json
 
 dashboard_bp = Blueprint('dashboard', __name__)
 
-# 🧭 Seller Dashboard
+#Seller Dashboard
 @dashboard_bp.route('/seller_dashboard')
 def seller_dashboard():
     if 'username' not in session or session.get('user_type') != 'seller':
@@ -44,7 +44,7 @@ def seller_dashboard():
 
     except sqlite3.OperationalError as e:
         if 'no such table: listings' in str(e):
-            print("⚠️ Table 'listings' not found. Creating it now...")
+            print("Table 'listings' not found. Creating it now...")
 
             try:
                 conn = sqlite3.connect('listings.db')
@@ -66,15 +66,15 @@ def seller_dashboard():
                 ''')
                 conn.commit()
                 conn.close()
-                print("✅ 'listings' table created successfully.")
+                print("'listings' table created successfully.")
             except Exception as create_err:
-                print(f"❌ Failed to create table: {create_err}")
+                print(f" Failed to create table: {create_err}")
         else:
-            print(f"❌ Unexpected error: {e}")
+            print(f" Unexpected error: {e}")
 
     return render_template('seller_dashboard.html', sold_listings=sold_properties, full_name=session.get('full_name'))
 
-# 🧭 Agent Dashboard
+# Agent Dashboard
 @dashboard_bp.route('/agent_dashboard')
 def agent_dashboard():
     if 'username' not in session or session.get('user_type') != 'agent':
@@ -115,7 +115,7 @@ def agent_dashboard():
 
     except sqlite3.OperationalError as e:
         if 'no such table: listings' in str(e):
-            print("⚠️ Table 'listings' not found. Creating it now...")
+            print("Table 'listings' not found. Creating it now...")
 
             try:
                 conn = sqlite3.connect('listings.db')
@@ -137,16 +137,16 @@ def agent_dashboard():
                 ''')
                 conn.commit()
                 conn.close()
-                print("✅ 'listings' table created successfully.")
+                print(" 'listings' table created successfully.")
             except Exception as create_err:
-                print(f"❌ Failed to create table: {create_err}")
+                print(f" Failed to create table: {create_err}")
         else:
-            print(f"❌ Unexpected error: {e}")
+            print(f" Unexpected error: {e}")
    
     return render_template('agent_dashboard.html', sold_listings=sold_properties, full_name=session.get('full_name'))
 
 
-# 🏠 Homepage
+#  Homepage
 @dashboard_bp.route('/')
 def index():
     sold_properties = []
@@ -183,7 +183,7 @@ def index():
 
     except sqlite3.OperationalError as e:
         if 'no such table: listings' in str(e):
-            print("⚠️ Table 'listings' not found. Creating it now...")
+            print("Table 'listings' not found. Creating it now...")
 
             try:
                 conn = sqlite3.connect('listings.db')
@@ -205,10 +205,10 @@ def index():
                 ''')
                 conn.commit()
                 conn.close()
-                print("✅ 'listings' table created successfully.")
+                print("'listings' table created successfully.")
             except Exception as create_err:
-                print(f"❌ Failed to create table: {create_err}")
+                print(f" Failed to create table: {create_err}")
         else:
-            print(f"❌ Unexpected error: {e}")
+            print(f" Unexpected error: {e}")
         
     return render_template('index.html', sold_listings=sold_properties)

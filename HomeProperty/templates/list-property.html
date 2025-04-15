@@ -280,7 +280,7 @@
 
   function fetchPastPrices() {
     fetchTriggeredManually = true;
-    sessionStorage.setItem('fetchedPrices', 'true');  // ✅ SET THE FLAG HERE
+    sessionStorage.setItem('fetchedPrices', 'true');  //  SET THE FLAG HERE
 
     const flatType = document.getElementById("flat_type").value;
     const town = document.getElementById("town").value;
@@ -306,7 +306,7 @@
 
     fetch(apiUrl)
       .then(response => {
-        console.log("📥 Raw response:", response);
+        console.log("Raw response:", response);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -314,14 +314,14 @@
       })
 
       .then(data => {
-        console.log("✅ Parsed data:", data);
+        console.log(" Parsed data:", data);
         const display = document.getElementById("past-price-display");
         const table = document.getElementById("price-table");
         const body = document.getElementById("price-table-body");
 
         document.getElementById("price-loading").style.display = "none";
 
-        console.log("📦 Received resale data:", data);
+        console.log(" Received resale data:", data);
         body.innerHTML = "";
 
         if (Array.isArray(data) && data.length) {
@@ -346,7 +346,7 @@
           display.style.color = "green";
           table.style.display = "table";
         } else {
-          display.textContent = "😕 No close matches found just yet.\nTry adjusting the floor area or lease duration to see more results.";
+          display.textContent = "No close matches found just yet.\nTry adjusting the floor area or lease duration to see more results.";
           display.style.color = "#555";  // softer color for a pleasant feel
           display.style.fontStyle = "italic";
           display.style.whiteSpace = "pre-line";  // allows line break in text
@@ -363,7 +363,7 @@
   window.addEventListener("DOMContentLoaded", () => {
     // Prevent re-fetch after form submission
     if (sessionStorage.getItem('fetchedPrices')) {
-      console.log("🛑 Skipping fetch on reload");
+      console.log(" Skipping fetch on reload");
       sessionStorage.removeItem('fetchedPrices');  // Clean up
     }
   });

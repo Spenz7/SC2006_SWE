@@ -59,11 +59,11 @@ def find_similar_past_prices(flat_type, town, floor_area, remaining_lease, max_t
     matched_records = []
     start_time = time.time()
 
-    print(f"🔍 Starting to fetch records for flat_type: {flat_type}, town: {town}, floor_area: {floor_area}, remaining_lease: {remaining_lease}")
+    print(f"Starting to fetch records for flat_type: {flat_type}, town: {town}, floor_area: {floor_area}, remaining_lease: {remaining_lease}")
 
     _, total_records = fetch_resale_data_from_api(flat_type, town, offset=0)
     if total_records == 0:
-        print("❌ No records found for the given flat type and town.")
+        print("No records found for the given flat type and town.")
         return []
 
     last_offset = (total_records - 1) // PAGE_SIZE * PAGE_SIZE
@@ -73,15 +73,15 @@ def find_similar_past_prices(flat_type, town, floor_area, remaining_lease, max_t
     min_lease, max_lease = int(remaining_lease) - 5, int(remaining_lease) + 5
 
     while offset >= 0 and time.time() - start_time <= max_time:
-        print(f"🔄 Fetching at offset: {offset}")
+        print(f"Fetching at offset: {offset}")
         filtered_batch = fetch_and_filter_batch(flat_type, town, offset, min_area, max_area, min_lease, max_lease)
         matched_records.extend(filtered_batch)
 
         if len(matched_records) >= 5:
-            print("✅ Found enough matches. Returning.")
+            print("Found enough matches. Returning.")
             return sorted(matched_records, key=lambda x: x.get('month', ''), reverse=True)[:5]
 
         offset -= PAGE_SIZE
 
-    print(f"✅ Total matches found after full scan: {len(matched_records)}")
+    print(f"Total matches found after full scan: {len(matched_records)}")
     return sorted(matched_records, key=lambda x: x.get('month', ''), reverse=True)[:5]

@@ -24,7 +24,7 @@ class MockOTPStrategy(OTPStrategy):
         return "mocked_sid"
         
 def send_otp_sms(phone_number, strategy):
-    from flask import session  # 🔁 Include this inside the function to avoid circular import issues
+    from flask import session  #Include this inside the function to avoid circular import issues
     otp = generate_otp()
     session['otp'] = otp
     print("DEBUG: OTP stored in session:", session.get('otp'))
