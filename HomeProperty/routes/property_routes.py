@@ -56,7 +56,7 @@ def list_property():
 def view_your_property():
     if 'username' not in session or session.get('user_type') != 'seller':
         flash("Access denied!", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     username = session['username']
     page = int(request.args.get('page', 1))  # Get current page from query param
@@ -194,7 +194,7 @@ def submit_bid():
 def view_bidded_property():
     if 'username' not in session or session.get('user_type') != 'agent':
         flash("Access denied! Only agents can view this page.", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     agent_username = session['username']
 
@@ -230,7 +230,7 @@ def view_bidded_property():
 def view_listed_property():
     if 'username' not in session or session.get('user_type') != 'agent':
         flash("Access denied! Only agents can view this page.", "danger")
-        return redirect(url_for('login'))
+        return redirect(url_for('auth.login'))
 
     conn = sqlite3.connect('listings.db')
     conn.row_factory = sqlite3.Row
