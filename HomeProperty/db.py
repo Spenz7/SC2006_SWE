@@ -24,7 +24,7 @@ def init_listings_db():
     c = conn.cursor()
 
     
-    # ✅ Now create fresh table with the correct columns
+    #Now create fresh table with the correct columns
     c.execute('''
         CREATE TABLE listings (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
