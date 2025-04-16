@@ -20,6 +20,7 @@ class TwilioOTPStrategy(OTPStrategy):
 
 class MockOTPStrategy(OTPStrategy):
     def send(self, phone_number, otp):
+         """Fakes OTP sending by printing to console and returning a mock SID."""
         print(f"[MOCK] Your OTP is {otp} sent to {phone_number}")
         return "mocked_sid"
         
