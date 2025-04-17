@@ -39,7 +39,8 @@ Agents can view, bid and counterbid on properties
 
 Real-time price suggestions using Data.gov resale API
 
-OTP-secured registration using Twilio SMS
+OTP-secured registration using Twilio SMS, note that due to Twilio free-account limitations, only 1 phone number works (Use 93898718, Spencer's phone number) for account
+registration
 
 Integrated dashboards for both agents and sellers
 
