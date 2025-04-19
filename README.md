@@ -41,6 +41,7 @@ Real-time price suggestions using Data.gov resale API
 
 OTP-secured registration using Twilio SMS, note that due to Twilio free-account limitations, only 1 phone number works (Use 93898718, Spencer's phone number) for account
 registration
+Note that the OTP will be printed on the console as well once app.py is run and the GET OTP button is pressed from the website. The tester can then use the OTP printed on the console as the OTP to key into the website. Reason being tester won't have access to the phone with the phone number 93898718.
 
 Integrated dashboards for both agents and sellers
 
