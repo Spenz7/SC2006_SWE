@@ -30,7 +30,7 @@ A Flask-based web application for property listing and bidding. Built for SC2006
 
 ## Overview
 
-HomeProperty bridges sellers and property agents on a digital platform with secure logins, agent bidding features, and helpful insights from resale price trends. It emphasizes:
+PropBidder bridges sellers and property agents on a digital platform with secure logins, agent bidding features, and helpful insights from resale price trends. It emphasizes:
 
 - Transparent agent selection based on bids and reviews  
 - Real-time price data from Data.gov.sg  
