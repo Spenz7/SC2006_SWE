@@ -41,20 +41,21 @@ HomeProperty bridges sellers and property agents on a digital platform with secu
 
 <details>
 <summary>Demo Video</summary>
-<br>
 
-https://www.youtube.com/watch?v=f1LLvvwkYbs
+https://www.youtube.com/watch?v=f1LLvvwkYbs <br>
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab4/SC2006%20Demo%20Flow%20Script.pdf> Live Demo Script </a>
+
 
 </details>
 
 <details>
 <summary>Supporting Documents</summary>
 <br>
-
-1. Software Requirements Specification (SRS)  
-2. System Architecture & Class Diagram  
-3. Use Case Descriptions  
-4. UI Mockups  
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab4/SC2006_SRS_Group4.pdf">1. Software Requirements Specification (SRS) </a> <br>
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab3/ClassDiagramSC2006.jpg">2. Class Diagram </a> <br>
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab3/Use%20Case%20Diagram.png">3. System Architecture </a> <br>
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab3/Use%20Case%20Diagram.png">4. Use Case Diagram </a> <br>
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab4/Updated-Sequence-Diagrams.pdf">5. Sequence Diagram </a>
 
 </details>
 
