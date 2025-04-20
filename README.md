@@ -134,8 +134,9 @@ registration
 
 ### APIs
 
-- Twilio API – OTP authentication  
-- [Data.gov.sg](https://data.gov.sg) – HDB resale price data
+- Twilio API – OTP authentication
+- [Data.gov.sg](https://data.gov.sg/datasets/d_07c63be0f37e6e59c07a4ddc2fd87fcb/view?dataExplorerPage=4) – CEA salesperson Information
+- [Data.gov.sg](https://data.gov.sg/datasets/d_8b84c4ee58e3cfc0ece0d773c8ca6abc/view?dataExplorerPage=20423) – HDB resale price data
 
 ---
 ### Team
