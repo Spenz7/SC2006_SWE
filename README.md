@@ -43,7 +43,7 @@ HomeProperty bridges sellers and property agents on a digital platform with secu
 <summary>Demo Video</summary>
 
 https://www.youtube.com/watch?v=f1LLvvwkYbs <br>
-<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab4/SC2006%20Demo%20Flow%20Script.pdf> Live Demo Script </a>
+<a href="https://github.com/softwarelab3/2006-SCSB-T4/blob/main/Lab4/SC2006%20Demo%20Flow%20Script.pdf"> Live Demo Script </a>
 
 
 </details>
