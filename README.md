@@ -90,9 +90,9 @@ Once the server starts, visit http://127.0.0.1:5000 in your browser to access th
 
 ## Pre-configured Test Account
 
-OTP-secured registration using Twilio SMS, note that due to Twilio free-account limitations, only 1 phone number works (Use 93898718, Spencer's phone number) for account
+OTP-secured registration using Twilio SMS, note that due to Twilio free-account limitations, only 1 phone number works (Use Spencer's phone number) for account
 registration
-**Note:** The OTP will be printed on the console as well once app.py is run and the GET OTP button is pressed from the website. The tester can then use the OTP printed on the console as the OTP to key into the website. Reason being tester won't have access to the phone with the phone number 93898718.
+**Note:** The OTP will be printed on the console as well once app.py is run and the GET OTP button is pressed from the website. The tester can then use the OTP printed on the console as the OTP to key into the website. Reason being tester won't have access to the phone with the phone number.
 
 ## Features
 
