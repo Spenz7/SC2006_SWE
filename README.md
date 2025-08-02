@@ -1,6 +1,17 @@
 # 2006-SCSB-T4
 Project Codes are currently using the HomeProperty Refactored Branch 
 
+## License
+
+This code is made public for viewing purposes only.
+
+Please do **not** ccopy, modify, distribute, reproduce, or use any part of the source code, in whole or in part, of this project without explicit permission from the author.
+
+This includes but is not limited to: using code in other projects, republishing the repository, or deriving modified versions.
+
+This software is provided "as is", without warranty of any kind.
+
+
 #  HomeProperty Platform – 2006-SCSB-T4
 
 A Flask-based web application for property listing and bidding. Built for SC2006 Software Engineering with features for sellers to list properties and agents to bid for them.
